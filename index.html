@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avelure — Social Command Dashboard 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0C1B2B; --navy-mid:#1A2E42; --navy-light:#243d54;
+  --gold:#C6A663; --gold-dk:#a98c54; --gold-lt:#d4b878;
+  --pearl:#F7F4EF; --blush:#E6D7CA; --ivory:#EFE9E3;
+  --sand:#D6C8B8; --rose:#D7BFA5;
+  --bg:#F5F2ED; --card:#FFFFFF; --text:#1a1a1a;
+  --muted:#888; --faint:#bbb; --border:#e8e4de; --blt:#f0ece7;
+  --ok:#2d6a4f; --ok-bg:#d8f3dc;
+  --warn:#856404; --warn-bg:#fff3cd;
+  --err:#c0392b; --err-bg:#fde8e8;
+  --info:#1a5276; --info-bg:#d6eaf8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+
+/* ── SIDEBAR ── */
+.sb{position:fixed;top:0;left:0;width:220px;height:100vh;background:var(--navy);display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+.sb-brand{padding:28px 20px 18px;border-bottom:1px solid var(--navy-mid)}
+.sb-wordmark{font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:400;color:var(--gold);letter-spacing:.14em;text-transform:uppercase}
+.sb-medspa{font-size:8px;color:rgba(198,166,99,.45);letter-spacing:.22em;text-transform:uppercase;margin-top:2px}
+.sb-rule{height:1px;background:linear-gradient(90deg,var(--gold),rgba(198,166,99,.15));margin:10px 0 6px;border-radius:1px}
+.sb-tag{font-size:9px;color:rgba(198,166,99,.35);letter-spacing:.12em;text-transform:uppercase}
+.sb-nav{padding:14px 0;flex:1}
+.sb-sec{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.22);padding:10px 20px 4px;font-weight:500}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;color:rgba(255,255,255,.5);cursor:pointer;font-size:12px;border-left:2px solid transparent;transition:all .15s;user-select:none}
+.nav-item:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.04)}
+.nav-item.active{color:var(--gold);border-left-color:var(--gold);background:rgba(198,166,99,.07)}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.sb-foot{padding:14px 20px;border-top:1px solid var(--navy-mid);font-size:10px;color:rgba(255,255,255,.18)}
+
+/* ── MAIN ── */
+.main{margin-left:220px;min-height:100vh;padding:32px}
+.panel{display:none}.panel.active{display:block}
+
+/* ── HEADER ── */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.pt{font-family:"Cormorant Garamond",serif;font-size:28px;font-weight:400;color:var(--navy);letter-spacing:.02em}
+.ps{font-size:12px;color:var(--muted);margin-top:2px}
+.gold-bar{height:2px;background:linear-gradient(90deg,var(--gold),var(--rose));border-radius:1px;margin-bottom:22px}
+
+/* ── PROGRESS ── */
+.prog-wrap{margin-bottom:4px}
+.prog-lbl{font-size:11px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between}
+.prog-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;width:200px}
+.prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s}
+
+/* ── STAT BAR ── */
+.stat-bar{background:var(--navy);border-radius:12px;padding:18px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat-item{text-align:center}
+.stat-val{font-family:"Cormorant Garamond",serif;font-size:26px;color:var(--gold)}
+.stat-lbl{font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+
+/* ── SECTION HEAD ── */
+.sh{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:10px;margin-top:22px;display:flex;align-items:center;gap:8px}
+.sh::after{content:"";flex:1;height:1px;background:var(--border)}
+
+/* ── STEP CARDS ── */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:5px;transition:border-color .15s,box-shadow .15s;cursor:pointer}
+.sc:hover{border-color:var(--gold);box-shadow:0 2px 12px rgba(198,166,99,.1)}
+.sc.done{border-left:3px solid var(--ok)}.sc.wip{border-left:3px solid var(--gold)}
+.sc-top{display:flex;align-items:center;gap:8px}
+.chk{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--card)}
+.chk.done-c{background:var(--ok-bg);border-color:var(--ok)}.chk.done-c::after{content:"\2713";font-size:11px;color:var(--ok);font-weight:700}
+.chk.wip-c{background:#fff8e8;border-color:var(--gold)}.chk.wip-c::after{content:"\2192";font-size:11px;color:var(--gold-dk);font-weight:700}
+.sc-num{font-size:10px;color:var(--faint);font-weight:500}
+.sc-stat{margin-left:auto}
+.pill{font-size:9px;font-weight:500;padding:2px 7px;border-radius:10px;white-space:nowrap}
+.p-done{background:var(--ok-bg);color:var(--ok)}
+.p-wip{background:#fff8e8;color:var(--gold-dk);border:1px solid var(--gold-lt)}
+.p-build{background:var(--info-bg);color:var(--info)}
+.p-todo{background:var(--blt);color:var(--muted);border:1px solid var(--border)}
+.p-rec{background:var(--blush);color:#7a5c4a}
+.sc-lbl{font-size:13px;font-weight:500;color:var(--navy)}
+.sc-det{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* ── TRACKER ── */
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+.tc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:border-color .15s}
+.tc:hover{border-color:var(--gold-lt)}.tc.done{border-left:3px solid var(--ok)}.tc.wip{border-left:3px solid var(--gold)}
+.tb{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--card)}
+.tb.done-c{background:var(--ok-bg);border-color:var(--ok)}.tb.done-c::after{content:"\2713";font-size:11px;color:var(--ok);font-weight:700}
+.tb.wip-c{background:#fff8e8;border-color:var(--gold)}.tb.wip-c::after{content:"\2192";font-size:11px;color:var(--gold-dk);font-weight:700}
+.tc-body{flex:1}
+.tc-title{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:2px}
+.tc-sub{font-size:11px;color:var(--muted);line-height:1.4}
+
+/* ── CHECKLIST ── */
+.cl{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+.ci{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color .15s}
+.ci:hover{border-color:var(--gold-lt)}.ci.done{border-left:3px solid var(--ok)}
+.ci.done .ci-lbl{text-decoration:line-through;color:var(--muted)}
+.ib{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.ib.done-c{background:var(--ok-bg);border-color:var(--ok)}.ib.done-c::after{content:"\2713";font-size:10px;color:var(--ok);font-weight:700}
+.ci-lbl{flex:1;font-size:12px;color:var(--text)}
+.ci-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.pri{font-size:9px;font-weight:500;padding:2px 7px;border-radius:10px;flex-shrink:0;align-self:flex-start;margin-top:2px}
+.ph-hi{background:var(--err-bg);color:var(--err)}.ph-md{background:var(--warn-bg);color:var(--warn)}.ph-lo{background:var(--ok-bg);color:var(--ok)}
+
+/* ── PHASE ── */
+.phase-blk{margin-bottom:26px}
+.phase-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.phase-badge{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.phase-title{font-family:"Cormorant Garamond",serif;font-size:17px;font-weight:400;color:var(--navy);letter-spacing:.01em}
+
+/* ── METRICS ── */
+.mrow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+.mc{background:var(--card);border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:10px;padding:16px}
+.mv{font-family:"Cormorant Garamond",serif;font-size:26px;font-weight:400;color:var(--navy)}
+.ml{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── DIVIDER ── */
+.div{border:none;border-top:1px solid var(--border);margin:22px 0}
+
+/* ── CALENDAR ── */
+.cal-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.mbtn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all .15s;font-family:"DM Sans",sans-serif}
+.mbtn:hover{background:var(--ivory);color:var(--navy);border-color:var(--sand)}
+.mbtn.active{background:var(--navy);color:var(--gold);border-color:var(--navy)}
+.cal-month{display:none}.cal-month.active{display:block}
+.cal-mtitle{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:400;color:var(--navy);margin-bottom:14px}
+.week-blk{margin-bottom:20px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.wk-lbl{background:var(--navy);color:var(--gold);font-size:11px;font-weight:500;padding:8px 14px;letter-spacing:.04em;line-height:1.4}
+.posts-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.pc{padding:14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--card);transition:background .15s}
+.pc:hover{background:#fdfcfb}.pc.done{background:#f8fdf9;opacity:.65}.pc.done .pc-title{text-decoration:line-through;color:var(--muted)}
+.pc-top{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.pchk{width:16px;height:16px;border-radius:4px;border:1.5px solid #ddd;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pchk:hover{border-color:var(--gold)}.pchk.done-c{background:var(--ok-bg);border-color:var(--ok)}.pchk.done-c::after{content:"\2713";font-size:10px;color:var(--ok);font-weight:700}
+.ptype{font-size:9px;font-weight:600;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:.05em}
+.fb-badge{font-size:9px;background:var(--navy);color:var(--gold);padding:2px 5px;border-radius:3px;font-weight:600;letter-spacing:.04em}
+.pc-reel .ptype{background:#dbeafe;color:#1e40af}.pc-reel{border-left:3px solid #93c5fd}
+.pc-carousel .ptype{background:#dcfce7;color:#166534}.pc-carousel{border-left:3px solid #86efac}
+.pc-story .ptype{background:#fef9c3;color:#854d0e}.pc-story{border-left:3px solid #fde047}
+.pc-edu .ptype{background:var(--ivory);color:#5c4a2a}.pc-edu{border-left:3px solid var(--sand)}
+.pc-promo .ptype{background:#fff7ed;color:#9a3412}.pc-promo{border-left:3px solid #fdba74}
+.pc-giveaway .ptype{background:#f0fdf4;color:#14532d}.pc-giveaway{border-left:3px solid #4ade80}
+.pc-title{font-size:12px;font-weight:500;color:var(--navy);margin-bottom:5px;line-height:1.4}
+.pc-detail{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:8px}
+.pc-cap{background:var(--ivory);border-radius:6px;padding:7px 9px}
+.pc-cap-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);margin-bottom:3px}
+.pc-cap-txt{font-size:11px;color:#5c4a2a;line-height:1.6}
+.leg-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:3px}
+
+/* ── RESOURCES ── */
+.rl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-bottom:20px}
+.rl-card{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:inherit;transition:border-color .15s,box-shadow .15s}
+.rl-card:hover{border-color:var(--gold);box-shadow:0 2px 10px rgba(198,166,99,.1)}
+.rl-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.rl-body{flex:1;min-width:0}
+.rl-title{font-size:13px;font-weight:500;color:var(--navy)}
+.rl-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.rl-arr{font-size:14px;color:var(--faint);flex-shrink:0}
+
+/* ── COLLAB ── */
+.collab-intro{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;padding:12px 16px;background:var(--ivory);border-radius:8px;border-left:3px solid var(--gold)}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:8px}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.cc-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.cc-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.cc-title{font-size:13px;font-weight:500;color:var(--navy)}
+.cc-body{padding:12px 14px}
+.cc-steps{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.cc-step{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text);line-height:1.5}
+.step-badge{width:18px;height:18px;border-radius:50%;background:var(--navy);color:var(--gold);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.cc-note{background:var(--ivory);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--muted);line-height:1.6}
+.cc-note-title{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--navy);margin-bottom:5px}
+.cc-note ul{padding-left:14px}.cc-note li{margin-bottom:2px}
+
+/* ── REQ CARDS ── */
+.req-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:16px}
+.req-c{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.req-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.req-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.req-title{font-size:13px;font-weight:500;color:var(--navy)}
+.req-body{font-size:12px;color:var(--muted);line-height:1.6}
+.req-body ul{padding-left:14px}.req-body li{margin-bottom:3px}
+.rtag{display:inline-block;font-size:9px;font-weight:500;padding:2px 7px;border-radius:10px;margin-top:6px}
+.rtag-ba{background:#fce7f3;color:#9d174d}.rtag-vid{background:#dbeafe;color:#1e40af}
+.rtag-ss{background:#dcfce7;color:#166534}.rtag-mo{background:var(--warn-bg);color:var(--warn)}
+
+/* ── HOW-TO ── */
+.ht-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:10px}
+.ht-title{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ht-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.ht-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.do-col,.no-col{padding:10px 12px;border-radius:8px;font-size:11px;line-height:1.6}
+.do-col{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d}
+.no-col{background:#fef2f2;border:1px solid #fecaca;color:#7f1d1d}
+.do-col strong,.no-col strong{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.do-col ul,.no-col ul{padding-left:14px}.do-col li,.no-col li{margin-bottom:3px}
+
+/* ── ALERT ── */
+.alert-red{background:#fff5f5;border:1.5px solid #fca5a5;border-radius:10px;padding:16px 18px;margin-bottom:20px}
+.alert-title{font-size:14px;font-weight:500;color:#991b1b;margin-bottom:8px}
+.alert-body{font-size:12px;color:#7f1d1d;line-height:1.7}
+.alert-body ul{padding-left:16px;margin-top:6px}.alert-body li{margin-bottom:4px}
+
+/* ── FOLDER BOX ── */
+.fbox{background:var(--ivory);border:1px solid var(--sand);border-radius:10px;padding:16px 18px;margin-bottom:10px}
+.fbox-title{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:6px}
+.fbox-body{font-size:12px;color:var(--muted);line-height:1.8}
+code{background:var(--sand);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--navy);font-family:monospace}
+
+/* ── MSG BOX ── */
+.msg-box{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:10px;padding:16px 18px;margin-bottom:10px;font-size:12px;color:var(--text);line-height:1.7}
+.msg-lbl{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--gold-dk);margin-bottom:8px}
+
+/* ── HIGHLIGHT SWATCHES ── */
+.hl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.hl-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px}
+.hl-swatch{width:40px;height:40px;border-radius:50%;flex-shrink:0;border:.5px solid rgba(0,0,0,.08)}
+.hl-info{}
+.hl-name{font-size:13px;font-weight:500;color:var(--navy)}
+.hl-hex{font-size:10px;color:var(--muted);font-family:monospace;margin-top:1px}
+</style>
+</head>
+<body>
+
+<div class="sb">
+  <div class="sb-brand">
+    <div class="sb-wordmark">Avelure</div>
+    <div class="sb-medspa">Med Spa</div>
+    <div class="sb-rule"></div>
+    <div class="sb-tag">Social Command 2026</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Overview</div>
+    <div class="nav-item active" data-panel="overview"><span class="nav-dot"></span>Dashboard</div>
+    <div class="nav-item" data-panel="tracker"><span class="nav-dot"></span>Project Tracker</div>
+    <div class="sb-sec">Platforms</div>
+    <div class="nav-item" data-panel="instagram"><span class="nav-dot"></span>Instagram</div>
+    <div class="nav-item" data-panel="linktree"><span class="nav-dot"></span>Linktree</div>
+    <div class="nav-item" data-panel="facebook"><span class="nav-dot"></span>Facebook</div>
+    <div class="sb-sec">Planning</div>
+    <div class="nav-item" data-panel="calendar"><span class="nav-dot"></span>Content Calendar</div>
+    <div class="nav-item" data-panel="highlights"><span class="nav-dot"></span>Highlights Spec</div>
+    <div class="sb-sec">Resources</div>
+    <div class="nav-item" data-panel="resources"><span class="nav-dot"></span>Resources &amp; Links</div>
+  </nav>
+  <div class="sb-foot">Weramp / AMP &mdash; Morgan Steffner</div>
+</div>
+
+<div class="main">
+
+<!-- OVERVIEW -->
+<div id="panel-overview" class="panel active">
+<div class="ph">
+  <div><div class="pt">Avelure Social Dashboard</div><div class="ps">Instagram &middot; Linktree &middot; Facebook &mdash; Full 2026 Rollout</div></div>
+  <div class="prog-wrap">
+    <div class="prog-lbl"><span>Overall progress</span><span id="pct">0%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="pbar" style="width:0%"></div></div>
+  </div>
+</div>
+<div class="gold-bar"></div>
+<div class="stat-bar">
+  <div class="stat-item"><div class="stat-val" id="s-done">0</div><div class="stat-lbl">Steps complete</div></div>
+  <div class="stat-item"><div class="stat-val" id="s-wip">0</div><div class="stat-lbl">In progress</div></div>
+  <div class="stat-item"><div class="stat-val" id="s-todo">0</div><div class="stat-lbl">To do</div></div>
+  <div class="stat-item"><div class="stat-val" id="s-cal">0/0</div><div class="stat-lbl">Posts checked off</div></div>
+</div>
+<div class="sh" style="margin-top:0">Instagram</div>
+<div class="steps-grid">
+  <div class="sc done" data-step="s1"><div class="sc-top"><div class="chk done-c"></div><div class="sc-num">Step 1</div><div class="sc-stat"><span class="pill p-done">Done</span></div></div><div class="sc-lbl">Name field (SEO)</div><div class="sc-det">Avelure Med Spa | Injectables &amp; Skin &mdash; live</div></div>
+  <div class="sc done" data-step="s2"><div class="sc-top"><div class="chk done-c"></div><div class="sc-num">Step 2</div><div class="sc-stat"><span class="pill p-wip">Review</span></div></div><div class="sc-lbl">Bio copy</div><div class="sc-det">Live &mdash; confirm final character count</div></div>
+  <div class="sc wip" data-step="s3"><div class="sc-top"><div class="chk wip-c"></div><div class="sc-num">Step 3</div><div class="sc-stat"><span class="pill p-build">Needs build</span></div></div><div class="sc-lbl">Linktree setup</div><div class="sc-det">4 links locked and verified</div></div>
+  <div class="sc wip" data-step="s4"><div class="sc-top"><div class="chk wip-c"></div><div class="sc-num">Step 4</div><div class="sc-stat"><span class="pill p-build">Needs build</span></div></div><div class="sc-lbl">Highlight covers</div><div class="sc-det">6 covers &middot; 6 brand colors &middot; build in Canva</div></div>
+  <div class="sc" data-step="s5"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 5</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Visual style guide</div><div class="sc-det">Soft daylight &middot; Navy / Gold / Pearl &middot; editorial</div></div>
+  <div class="sc" data-step="s6"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 6</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">9-post grid plan</div><div class="sc-det">First grid layout mapped &middot; balance across pillars</div></div>
+  <div class="sc" data-step="s7"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 7</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Content pillars</div><div class="sc-det">35% results &middot; 25% edu &middot; 20% lifestyle &middot; 10% authority &middot; 10% promos</div></div>
+  <div class="sc" data-step="s8"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 8</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Reel ideation bank</div><div class="sc-det">20 high-performing reel ideas ready</div></div>
+  <div class="sc" data-step="s9"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 9</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Caption framework</div><div class="sc-det">Hook &rarr; value &rarr; CTA &middot; luxury tone &middot; 5 examples</div></div>
+  <div class="sc" data-step="s10"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 10</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Hashtag strategy</div><div class="sc-det">3 sets &middot; 15&ndash;20 per post &middot; treatment + location + brand</div></div>
+  <div class="sc" data-step="s11"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 11</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Location tagging</div><div class="sc-det">Every post tagged &middot; city name in caption</div></div>
+  <div class="sc" data-step="s12"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 12</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Monthly KPI tracking</div><div class="sc-det">Saves &middot; shares &middot; reach &middot; profile visits &middot; link clicks</div></div>
+</div>
+<div class="sh">Linktree &amp; Facebook</div>
+<div class="steps-grid">
+  <div class="sc done" data-step="lt1"><div class="sc-top"><div class="chk done-c"></div><div class="sc-num">LT</div><div class="sc-stat"><span class="pill p-done">Done</span></div></div><div class="sc-lbl">Link order &amp; URLs</div><div class="sc-det">Book &middot; Specials &middot; Treatments &middot; Locations &mdash; locked</div></div>
+  <div class="sc" data-step="lt2"><div class="sc-top"><div class="chk"></div><div class="sc-num">LT</div><div class="sc-stat"><span class="pill p-build">Needs build</span></div></div><div class="sc-lbl">Build live in Linktree</div><div class="sc-det">Navy bg &middot; Gold buttons &middot; primary CTA solid fill</div></div>
+  <div class="sc" data-step="fb1"><div class="sc-top"><div class="chk"></div><div class="sc-num">FB</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Facebook page setup</div><div class="sc-det">Name &middot; category &middot; photo &middot; cover &middot; Book Now CTA</div></div>
+  <div class="sc" data-step="fb2"><div class="sc-top"><div class="chk"></div><div class="sc-num">FB</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Meta Business Suite</div><div class="sc-det">Connect IG + FB &middot; unified scheduling active</div></div>
+  <div class="sc" data-step="fb3"><div class="sc-top"><div class="chk"></div><div class="sc-num">FB</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Meta Pixel installed</div><div class="sc-det">Pixel on aveluremedspa.com &middot; retargeting ready</div></div>
+</div>
+</div>
+
+<!-- TRACKER -->
+<div id="panel-tracker" class="panel">
+<div class="ph"><div><div class="pt">Project Tracker</div><div class="ps">All tasks across Instagram, Linktree, Facebook, and Content</div></div></div>
+<div class="gold-bar"></div>
+<div class="sh" style="margin-top:0">Instagram &mdash; Profile &amp; Setup</div>
+<div class="tg">
+  <div class="tc done" data-track="t1"><div class="tb done-c"></div><div class="tc-body"><div class="tc-title">Name field updated <span class="pill p-done" style="margin-left:6px">Done</span></div><div class="tc-sub">Avelure Med Spa | Injectables &amp; Skin &mdash; live</div></div></div>
+  <div class="tc done" data-track="t2"><div class="tb done-c"></div><div class="tc-body"><div class="tc-title">Bio copy live <span class="pill p-wip" style="margin-left:6px">Review</span></div><div class="tc-sub">Confirm final version is under 150 characters</div></div></div>
+  <div class="tc wip" data-track="t3"><div class="tb wip-c"></div><div class="tc-body"><div class="tc-title">Linktree built <span class="pill p-build" style="margin-left:6px">Needs build</span></div><div class="tc-sub">Navy bg &middot; Gold buttons &middot; 4 links live</div></div></div>
+  <div class="tc wip" data-track="t4"><div class="tb wip-c"></div><div class="tc-body"><div class="tc-title">Highlight covers built <span class="pill p-build" style="margin-left:6px">Needs build</span></div><div class="tc-sub">6 covers &middot; brand colors &middot; 1080&times;1080px in Canva</div></div></div>
+  <div class="tc" data-track="t5"><div class="tb"></div><div class="tc-body"><div class="tc-title">Highlight content populated <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">Treatments &middot; Locations &middot; Reviews &middot; Results &middot; FAQs &middot; Promotions</div></div></div>
+  <div class="tc" data-track="t6"><div class="tb"></div><div class="tc-body"><div class="tc-title">9-post grid planned &amp; shot <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">First 9 posts queued &middot; editorial aesthetic confirmed</div></div></div>
+  <div class="tc" data-track="t7"><div class="tb"></div><div class="tc-body"><div class="tc-title">Caption framework documented <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">Hook &rarr; value &rarr; CTA &middot; 5 template captions written</div></div></div>
+  <div class="tc" data-track="t8"><div class="tb"></div><div class="tc-body"><div class="tc-title">Hashtag sets created <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">3 sets &middot; 15&ndash;20 tags each &middot; saved in scheduling tool</div></div></div>
+  <div class="tc" data-track="t9"><div class="tb"></div><div class="tc-body"><div class="tc-title">Reel ideation bank (20 ideas) <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">Documented &middot; assigned to content creator</div></div></div>
+  <div class="tc" data-track="t10"><div class="tb"></div><div class="tc-body"><div class="tc-title">Scheduling tool confirmed <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">Meta Business Suite or Later/Sprout &middot; owner assigned</div></div></div>
+</div>
+<div class="sh">Linktree</div>
+<div class="tg">
+  <div class="tc done" data-track="tlt1"><div class="tb done-c"></div><div class="tc-body"><div class="tc-title">Link order &amp; URLs finalized <span class="pill p-done" style="margin-left:6px">Done</span></div><div class="tc-sub">All 4 links confirmed with destination URLs</div></div></div>
+  <div class="tc" data-track="tlt2"><div class="tb"></div><div class="tc-body"><div class="tc-title">Live in Linktree <span class="pill p-build" style="margin-left:6px">Needs build</span></div><div class="tc-sub">Navy #0C1B2B &middot; Gold #C6A663 &middot; @aveluremedspa handle</div></div></div>
+  <div class="tc" data-track="tlt3"><div class="tb"></div><div class="tc-body"><div class="tc-title">Analytics enabled <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">Click tracking per link &middot; monthly reporting</div></div></div>
+  <div class="tc" data-track="tlt4"><div class="tb"></div><div class="tc-body"><div class="tc-title">Monthly audit cadence set <span class="pill p-rec" style="margin-left:6px">Recurring</span></div><div class="tc-sub">Update promo link monthly &middot; verify all URLs</div></div></div>
+</div>
+<div class="sh">Facebook</div>
+<div class="tg">
+  <div class="tc" data-track="tfb1"><div class="tb"></div><div class="tc-body"><div class="tc-title">Page setup complete <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">Name &middot; Medical Spa category &middot; logo &middot; cover &middot; Book Now CTA</div></div></div>
+  <div class="tc" data-track="tfb2"><div class="tb"></div><div class="tc-body"><div class="tc-title">Meta Business Suite connected <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">IG + FB linked &middot; unified scheduling active</div></div></div>
+  <div class="tc" data-track="tfb3"><div class="tb"></div><div class="tc-body"><div class="tc-title">Meta Pixel installed <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">Pixel on aveluremedspa.com &middot; retargeting ready</div></div></div>
+  <div class="tc" data-track="tfb4"><div class="tb"></div><div class="tc-body"><div class="tc-title">Facebook Reviews enabled <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">24hr response policy in place</div></div></div>
+  <div class="tc" data-track="tfb5"><div class="tb"></div><div class="tc-body"><div class="tc-title">Cross-posting Reels active <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">All IG Reels auto-posted to Facebook Reels</div></div></div>
+</div>
+<div class="sh">Content &amp; Reporting</div>
+<div class="tg">
+  <div class="tc" data-track="tc1"><div class="tb"></div><div class="tc-body"><div class="tc-title">Content sourcing pipeline <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">Before/afters &middot; provider clips &middot; clinic photography &middot; UGC</div></div></div>
+  <div class="tc" data-track="tc2"><div class="tb"></div><div class="tc-body"><div class="tc-title">Monthly KPI report template <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">Saves &middot; shares &middot; reach &middot; profile visits &middot; link clicks</div></div></div>
+  <div class="tc" data-track="tc3"><div class="tb"></div><div class="tc-body"><div class="tc-title">Social account handoff doc <span class="pill p-todo" style="margin-left:6px">To do</span></div><div class="tc-sub">Login access &middot; brand guidelines &middot; posting SOPs</div></div></div>
+</div>
+</div>
+
+<!-- INSTAGRAM -->
+<div id="panel-instagram" class="panel">
+<div class="ph"><div><div class="pt">Instagram</div><div class="ps">@aveluremedspa &mdash; Full optimization plan</div></div></div>
+<div class="gold-bar"></div>
+<div class="mrow">
+  <div class="mc"><div class="mv">12</div><div class="ml">Optimization steps</div></div>
+  <div class="mc"><div class="mv">3&ndash;5&times;</div><div class="ml">Weekly reels target</div></div>
+  <div class="mc"><div class="mv">Daily</div><div class="ml">Stories cadence</div></div>
+  <div class="mc"><div class="mv">35%</div><div class="ml">Results content mix</div></div>
+</div>
+<div class="phase-blk">
+  <div class="phase-hd"><span class="phase-badge" style="background:#fde8e8;color:#c0392b">Phase 1 &mdash; Week 1</span><span class="phase-title">Profile &amp; Architecture</span></div>
+  <div class="steps-grid">
+    <div class="sc done"><div class="sc-top"><div class="chk done-c"></div><div class="sc-num">Step 1</div><div class="sc-stat"><span class="pill p-done">Done</span></div></div><div class="sc-lbl">Name field (SEO)</div><div class="sc-det">Avelure Med Spa | Injectables &amp; Skin &mdash; live</div></div>
+    <div class="sc done"><div class="sc-top"><div class="chk done-c"></div><div class="sc-num">Step 2</div><div class="sc-stat"><span class="pill p-wip">Review</span></div></div><div class="sc-lbl">Bio copy</div><div class="sc-det">Luxury tone &middot; confirm final char count</div></div>
+    <div class="sc wip"><div class="sc-top"><div class="chk wip-c"></div><div class="sc-num">Step 3</div><div class="sc-stat"><span class="pill p-build">Needs build</span></div></div><div class="sc-lbl">Linktree / link in bio</div><div class="sc-det">Book &rarr; Specials &rarr; Treatments &rarr; Locations</div></div>
+    <div class="sc wip"><div class="sc-top"><div class="chk wip-c"></div><div class="sc-num">Step 4</div><div class="sc-stat"><span class="pill p-build">Needs build</span></div></div><div class="sc-lbl">Highlight covers</div><div class="sc-det">6 covers &middot; 6 brand colors &middot; 1080&times;1080px solid fill</div></div>
+  </div>
+</div>
+<div class="phase-blk">
+  <div class="phase-hd"><span class="phase-badge" style="background:#fff3cd;color:#856404">Phase 2 &mdash; Weeks 2&ndash;3</span><span class="phase-title">Visual System &amp; Content Setup</span></div>
+  <div class="steps-grid">
+    <div class="sc"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 5</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Visual style guide</div><div class="sc-det">Soft daylight &middot; Navy / Gold / Pearl &middot; editorial simplicity</div></div>
+    <div class="sc"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 6</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">9-post grid plan</div><div class="sc-det">Results &middot; lifestyle &middot; education &middot; authority balance</div></div>
+    <div class="sc"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 7</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Content pillars</div><div class="sc-det">35% results &middot; 25% edu &middot; 20% lifestyle &middot; 10% authority &middot; 10% promos</div></div>
+    <div class="sc"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 8</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Reel ideation bank</div><div class="sc-det">20 ideas &middot; educational &middot; transformation &middot; POV</div></div>
+  </div>
+</div>
+<div class="phase-blk">
+  <div class="phase-hd"><span class="phase-badge" style="background:#d8f3dc;color:#2d6a4f">Phase 3 &mdash; Ongoing</span><span class="phase-title">Growth &amp; Performance</span></div>
+  <div class="steps-grid">
+    <div class="sc"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 9</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Caption framework</div><div class="sc-det">Hook &rarr; value &rarr; CTA &middot; luxury tone &middot; 5 examples</div></div>
+    <div class="sc"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 10</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Hashtag strategy</div><div class="sc-det">3 sets &middot; 15&ndash;20 per post &middot; treatment + location + brand</div></div>
+    <div class="sc"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 11</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Location tagging</div><div class="sc-det">Every post tagged &middot; city name in caption</div></div>
+    <div class="sc"><div class="sc-top"><div class="chk"></div><div class="sc-num">Step 12</div><div class="sc-stat"><span class="pill p-todo">To do</span></div></div><div class="sc-lbl">Monthly KPI tracking</div><div class="sc-det">Saves &middot; shares &middot; reach growth &middot; profile visits &middot; link clicks</div></div>
+  </div>
+</div>
+</div>
+
+<!-- LINKTREE -->
+<div id="panel-linktree" class="panel">
+<div class="ph"><div><div class="pt">Linktree</div><div class="ps">@aveluremedspa &mdash; 4-link setup</div></div></div>
+<div class="gold-bar"></div>
+<div class="sh" style="margin-top:0">Setup checklist</div>
+<div class="cl">
+  <div class="ci done" data-ci="ci-lt1"><div class="ib done-c"></div><div><div class="ci-lbl">Handle @aveluremedspa claimed</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci done" data-ci="ci-lt2"><div class="ib done-c"></div><div><div class="ci-lbl">Profile photo: logo on Navy circle uploaded</div><div class="ci-sub">Same asset as Instagram &middot; min 400&times;400px</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-lt3"><div class="ib"></div><div><div class="ci-lbl">Background set to Navy #0C1B2B</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-lt4"><div class="ib"></div><div><div class="ci-lbl">Button style: rounded &middot; Champagne Gold #C6A663 outline &middot; primary CTA solid fill</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci done" data-ci="ci-lt5"><div class="ib done-c"></div><div><div class="ci-lbl">Link 1 &mdash; Book an Appointment &rarr; aveluremedspa.com/our-locations/</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci done" data-ci="ci-lt6"><div class="ib done-c"></div><div><div class="ci-lbl">Link 2 &mdash; Monthly Specials &rarr; home.aveluremedspa.com/monthly-specials</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci done" data-ci="ci-lt7"><div class="ib done-c"></div><div><div class="ci-lbl">Link 3 &mdash; Explore Treatments &rarr; aveluremedspa.com/treatments/</div></div><span class="pri ph-md">Med</span></div>
+  <div class="ci done" data-ci="ci-lt8"><div class="ib done-c"></div><div><div class="ci-lbl">Link 4 &mdash; Find a Location &rarr; aveluremedspa.com/our-locations/</div></div><span class="pri ph-md">Med</span></div>
+  <div class="ci" data-ci="ci-lt9"><div class="ib"></div><div><div class="ci-lbl">Analytics enabled &middot; click tracking per link</div></div><span class="pri ph-lo">Low</span></div>
+  <div class="ci" data-ci="ci-lt10"><div class="ib"></div><div><div class="ci-lbl">Monthly audit: update promo link &middot; verify booking URLs</div></div><span class="pri ph-lo">Recurring</span></div>
+</div>
+</div>
+
+<!-- FACEBOOK -->
+<div id="panel-facebook" class="panel">
+<div class="ph"><div><div class="pt">Facebook</div><div class="ps">@aveluremedspa &mdash; Page setup &amp; content system</div></div></div>
+<div class="gold-bar"></div>
+<div class="sh" style="margin-top:0">Phase 1 &mdash; Week 1 &middot; Page setup &amp; branding</div>
+<div class="cl">
+  <div class="ci" data-ci="ci-fb1"><div class="ib"></div><div><div class="ci-lbl">Page name: Avelure Med Spa</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-fb2"><div class="ib"></div><div><div class="ci-lbl">Category: Medical Spa &middot; subcategory: Medical Aesthetics</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-fb3"><div class="ib"></div><div><div class="ci-lbl">Profile photo: Avelure logo on Navy &middot; same as Instagram</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-fb4"><div class="ib"></div><div><div class="ci-lbl">Cover photo: 820&times;312px &middot; lifestyle image &middot; Navy/Gold overlay &middot; tagline</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-fb5"><div class="ib"></div><div><div class="ci-lbl">CTA button: "Book Now" &rarr; primary booking page</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-fb6"><div class="ib"></div><div><div class="ci-lbl">About section: services &middot; website &middot; phone &middot; hours &middot; address per location</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-fb7"><div class="ib"></div><div><div class="ci-lbl">Custom username: @aveluremedspa</div></div><span class="pri ph-md">Med</span></div>
+</div>
+<div class="sh">Phase 2 &mdash; Weeks 2&ndash;3 &middot; Content &amp; posting</div>
+<div class="cl">
+  <div class="ci" data-ci="ci-fb8"><div class="ib"></div><div><div class="ci-lbl">Cross-post Instagram Reels to Facebook Reels</div><div class="ci-sub">No extra production &middot; auto-setup in Meta Business Suite</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-fb9"><div class="ib"></div><div><div class="ci-lbl">Facebook-native posts: before/afters &middot; Google reviews &middot; provider spotlights</div></div><span class="pri ph-md">Med</span></div>
+  <div class="ci" data-ci="ci-fb10"><div class="ib"></div><div><div class="ci-lbl">Post frequency: 3&ndash;4x per week &middot; no over-posting</div></div><span class="pri ph-md">Med</span></div>
+  <div class="ci" data-ci="ci-fb11"><div class="ib"></div><div><div class="ci-lbl">Facebook Reviews enabled &middot; 24hr response policy</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-fb12"><div class="ib"></div><div><div class="ci-lbl">Services tab: all treatment categories with descriptions</div></div><span class="pri ph-md">Med</span></div>
+</div>
+<div class="sh">Phase 3 &mdash; Ongoing &middot; Ads, local SEO &amp; engagement</div>
+<div class="cl">
+  <div class="ci" data-ci="ci-fb13"><div class="ib"></div><div><div class="ci-lbl">Meta Business Suite: unified IG + FB management</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-fb14"><div class="ib"></div><div><div class="ci-lbl">Facebook Events: promotions &middot; open houses &middot; treatment launches</div></div><span class="pri ph-lo">Low</span></div>
+  <div class="ci" data-ci="ci-fb15"><div class="ib"></div><div><div class="ci-lbl">Local targeting: geo-target all boosted posts per clinic market</div></div><span class="pri ph-md">Med</span></div>
+  <div class="ci" data-ci="ci-fb16"><div class="ib"></div><div><div class="ci-lbl">Meta Pixel installed on aveluremedspa.com</div></div><span class="pri ph-hi">High</span></div>
+  <div class="ci" data-ci="ci-fb17"><div class="ib"></div><div><div class="ci-lbl">Track monthly: reach &middot; engagement rate &middot; link clicks &middot; review count</div></div><span class="pri ph-lo">Low</span></div>
+</div>
+</div>
+
+<!-- HIGHLIGHTS -->
+<div id="panel-highlights" class="panel">
+<div class="ph"><div><div class="pt">Highlights Spec</div><div class="ps">6 covers &middot; final approved colors &middot; no text on cover</div></div></div>
+<div class="gold-bar"></div>
+<div class="sh" style="margin-top:0">Final highlight assignments</div>
+<div class="hl-grid">
+  <div class="hl-card"><div class="hl-swatch" style="background:#0C1B2B"></div><div class="hl-info"><div class="hl-name">Treatments</div><div class="hl-hex">Midnight Navy &middot; #0C1B2B</div></div></div>
+  <div class="hl-card"><div class="hl-swatch" style="background:#C6A663"></div><div class="hl-info"><div class="hl-name">Locations</div><div class="hl-hex">Champagne Gold &middot; #C6A663</div></div></div>
+  <div class="hl-card"><div class="hl-swatch" style="background:#D7BFA5"></div><div class="hl-info"><div class="hl-name">Reviews</div><div class="hl-hex">Rose Gold Tint &middot; #D7BFA5</div></div></div>
+  <div class="hl-card"><div class="hl-swatch" style="background:#D6C8B8"></div><div class="hl-info"><div class="hl-name">Results</div><div class="hl-hex">Sandstone Beige &middot; #D6C8B8</div></div></div>
+  <div class="hl-card"><div class="hl-swatch" style="background:#EFE9E3;border:.5px solid #D6C8B8"></div><div class="hl-info"><div class="hl-name">FAQs</div><div class="hl-hex">Warm Ivory &middot; #EFE9E3</div></div></div>
+  <div class="hl-card"><div class="hl-swatch" style="background:#E6D7CA"></div><div class="hl-info"><div class="hl-name">Promotions</div><div class="hl-hex">Blush Nude &middot; #E6D7CA</div></div></div>
+</div>
+<div class="sh">Build instructions</div>
+<div class="fbox">
+  <div class="fbox-title">How to build in Canva</div>
+  <div class="fbox-body">
+    1. Create new design &middot; Custom size &middot; <strong>1080 &times; 1080px</strong><br>
+    2. Set background color to the assigned hex above<br>
+    3. No other elements &mdash; solid fill only<br>
+    4. Download as PNG<br>
+    5. On Instagram: Create new Highlight &rarr; add a story &rarr; Edit Cover &rarr; upload PNG<br>
+    6. The label text (Treatments, Locations, etc.) is typed when naming the Highlight &mdash; it is not part of the cover image
+  </div>
+</div>
+</div>
+
+<!-- RESOURCES -->
+<div id="panel-resources" class="panel">
+<div class="ph"><div><div class="pt">Resources</div><div class="ps">Links, guides, SOPs, and content tools for the Avelure social team</div></div></div>
+<div class="gold-bar"></div>
+
+<div class="sh" style="margin-top:0">Avelure Live Accounts &amp; Pages</div>
+<div class="rl-grid">
+  <a class="rl-card" href="https://www.instagram.com/aveluremedspa/" target="_blank"><div class="rl-icon" style="background:#fce7f3;color:#9d174d">&#128247;</div><div class="rl-body"><div class="rl-title">Instagram</div><div class="rl-sub">@aveluremedspa &mdash; live profile</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="https://www.facebook.com/aveluremedspa" target="_blank"><div class="rl-icon" style="background:#dbeafe;color:#1e40af">&#128218;</div><div class="rl-body"><div class="rl-title">Facebook</div><div class="rl-sub">@aveluremedspa &mdash; live page</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="https://linktr.ee/aveluremedspa" target="_blank"><div class="rl-icon" style="background:#f0fdf4;color:#14532d">&#128279;</div><div class="rl-body"><div class="rl-title">Linktree</div><div class="rl-sub">linktr.ee/aveluremedspa &mdash; live link in bio</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="https://home.aveluremedspa.com/monthly-specials" target="_blank"><div class="rl-icon" style="background:#fff7ed;color:#9a3412">&#127991;</div><div class="rl-body"><div class="rl-title">Monthly Specials Page</div><div class="rl-sub">Live specials hub &mdash; update Linktree monthly</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="https://docs.google.com/spreadsheets/d/1PwFYUOg3HXKk1Kt4FYaXXIANCKONtY0r91XfSYo8ZS0/edit?usp=sharing" target="_blank"><div class="rl-icon" style="background:#dcfce7;color:#166534">&#128202;</div><div class="rl-body"><div class="rl-title">Master Marketing Sheet</div><div class="rl-sub">Google Sheets &mdash; central marketing tracking</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="https://advancedmedaespartners.sharepoint.com/:u:/s/AMPMarketingSupport/IQDCfgN156btTLHIE8Nf6mXtAZfdgjD6b61AlJzOVQQTdWg?e=0gYUYe" target="_blank"><div class="rl-icon" style="background:#ede9fe;color:#5b21b6">&#127970;</div><div class="rl-body"><div class="rl-title">AMP SharePoint Hub</div><div class="rl-sub">Marketing templates, assets &amp; support</div></div><div class="rl-arr">&rarr;</div></a>
+</div>
+
+<div class="sh">Tools, SOPs &amp; Brand Assets</div>
+<div class="rl-grid">
+  <a class="rl-card" href="#" onclick="alert('Update with live Avelure Content Folder URL');return false"><div class="rl-icon" style="background:#e0f2fe;color:#0369a1">&#128193;</div><div class="rl-body"><div class="rl-title">Avelure Content Folder</div><div class="rl-sub">Dedicated folder per location &mdash; drop all content here</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="#" onclick="alert('Update with live Brand Guide URL');return false"><div class="rl-icon" style="background:#fef9c3;color:#854d0e">&#127912;</div><div class="rl-body"><div class="rl-title">Avelure Brand Guide</div><div class="rl-sub">Colors, typography, tone, photography standards</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="https://docs.google.com/document/d/12vhCR0kG9Ofs-yZ7n-ZFaiPqrRGXde5lOuBFopPjY1U/edit" target="_blank"><div class="rl-icon" style="background:#dcfce7;color:#166534">&#128203;</div><div class="rl-body"><div class="rl-title">Social Media SOP</div><div class="rl-sub">Full training &amp; SOPs for practice managers</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="#" onclick="alert('Update with live Influencer Agreement URL');return false"><div class="rl-icon" style="background:#fce7f3;color:#9d174d">&#129309;</div><div class="rl-body"><div class="rl-title">Avelure Influencer Agreement</div><div class="rl-sub">Template for influencer partnerships and gifted services</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="#" onclick="alert('Update with live Stock Images URL');return false"><div class="rl-icon" style="background:#ede9fe;color:#5b21b6">&#128444;</div><div class="rl-body"><div class="rl-title">Stock Images</div><div class="rl-sub">Approved photography library for social and marketing</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="https://ampintelligence.ai/events" target="_blank"><div class="rl-icon" style="background:#fff7ed;color:#9a3412">&#128197;</div><div class="rl-body"><div class="rl-title">Event Marketing</div><div class="rl-sub">Submit event requests 60 days prior via AMP Intelligence</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="https://advancedmedaespartners.sharepoint.com/:x:/s/AMP/IQDYf3yyHwlvQo73XHLqLsTiAWcfZs2NSjOpEQEva5_9X9I?e=Yi2tAK" target="_blank"><div class="rl-icon" style="background:#f0fdf4;color:#14532d">&#127991;</div><div class="rl-body"><div class="rl-title">Coupon Offers</div><div class="rl-sub">Current approved coupon and discount offers</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="https://advancedmedaespartners.sharepoint.com/:x:/s/AMP/Edh_fLIfCW9CjvdccuouxOIBZx9mzY1KM6kRAS9rn_1f0g?e=Lf5TCj" target="_blank"><div class="rl-icon" style="background:#f0fdf4;color:#14532d">&#128202;</div><div class="rl-body"><div class="rl-title">Master Promo Sheet</div><div class="rl-sub">All active promotions across AMP brands</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="https://advancedmedaespartners-my.sharepoint.com/:w:/g/personal/msteffner_weramp_com/IQBN2EbVkd1sR5ZxZCMKKuadATcB24onNILVo4xM5Bo2g74?e=hIXeQa" target="_blank"><div class="rl-icon" style="background:#fce7f3;color:#9d174d">&#128247;</div><div class="rl-body"><div class="rl-title">Before &amp; Afters SOP</div><div class="rl-sub">Photo capture standards, angles, submission requirements</div></div><div class="rl-arr">&rarr;</div></a>
+  <a class="rl-card" href="https://advancedmedaespartners-my.sharepoint.com/:w:/g/personal/msteffner_weramp_com/IQAiXTSTLwF7T7CaSezjEkHEAVfnK5qci7oiyg0DSeR0EdA?e=tmSxCB" target="_blank"><div class="rl-icon" style="background:#dbeafe;color:#1e40af">&#128105;</div><div class="rl-body"><div class="rl-title">Marketing a New Provider SOP</div><div class="rl-sub">Step-by-step guide for introducing a new provider</div></div><div class="rl-arr">&rarr;</div></a>
+</div>
+
+<div class="div"></div>
+
+<div class="sh">Collaboration &amp; Cross-Posting</div>
+<div class="collab-intro">Collab posts and cross-posting are two of the highest-leverage tools on Instagram and Facebook. Done correctly, they double your reach without doubling your workload.</div>
+<div class="cg">
+  <div class="cc"><div class="cc-hd"><div class="cc-icon" style="background:#dbeafe;color:#1e40af">&#9889;</div><div class="cc-title">Instagram Collab Posts</div></div>
+  <div class="cc-body"><div class="cc-steps">
+    <div class="cc-step"><div class="step-badge">1</div><div>Create your post or Reel as normal in Instagram</div></div>
+    <div class="cc-step"><div class="step-badge">2</div><div>On the "Tag people" screen, tap <strong>Invite Collaborator</strong></div></div>
+    <div class="cc-step"><div class="step-badge">3</div><div>Search and select the collaborator account (vendor, influencer, partner brand)</div></div>
+    <div class="cc-step"><div class="step-badge">4</div><div>Post &mdash; collaborator receives an invitation to accept</div></div>
+    <div class="cc-step"><div class="step-badge">5</div><div>Once accepted, post appears on both feeds with both profile photos shown</div></div>
+  </div>
+  <div class="cc-note"><div class="cc-note-title">Use for:</div><ul><li>Vendor partnerships (Allergan, Galderma, SkinMedica)</li><li>Influencer gifted treatment posts</li><li>Local business cross-promotions</li><li>Providers with their own accounts</li><li>AMP corporate account amplification</li></ul></div>
+  </div></div>
+
+  <div class="cc"><div class="cc-hd"><div class="cc-icon" style="background:#dcfce7;color:#166534">&#128260;</div><div class="cc-title">Cross-Posting IG &rarr; Facebook</div></div>
+  <div class="cc-body"><div class="cc-steps">
+    <div class="cc-step"><div class="step-badge">1</div><div>Instagram Settings &rarr; Account Center &rarr; Sharing Across Profiles</div></div>
+    <div class="cc-step"><div class="step-badge">2</div><div>Connect your Facebook Page to your Instagram account</div></div>
+    <div class="cc-step"><div class="step-badge">3</div><div>Toggle on "Share to Facebook" &mdash; set as default or choose per post</div></div>
+    <div class="cc-step"><div class="step-badge">4</div><div>Reels, carousels, and feed posts all cross-post automatically</div></div>
+    <div class="cc-step"><div class="step-badge">5</div><div>Stories can also be shared &mdash; toggle on per story before posting</div></div>
+  </div>
+  <div class="cc-note"><div class="cc-note-title">Best practices:</div><ul><li>Always cross-post Reels &mdash; Facebook Reels reach a different demographic</li><li>Before/afters and carousels perform well on both platforms</li><li>Facebook-only posts (events, boosted) still need to be created in Meta Business Suite</li></ul></div>
+  </div></div>
+
+  <div class="cc"><div class="cc-hd"><div class="cc-icon" style="background:#fce7f3;color:#9d174d">&#129331;</div><div class="cc-title">Influencer Collaboration</div></div>
+  <div class="cc-body"><div class="cc-steps">
+    <div class="cc-step"><div class="step-badge">1</div><div>Identify local beauty/lifestyle influencers 3K&ndash;100K followers in your market</div></div>
+    <div class="cc-step"><div class="step-badge">2</div><div>Send the Avelure Influencer Agreement before scheduling</div></div>
+    <div class="cc-step"><div class="step-badge">3</div><div>Agree on deliverables: posts, Stories, Reels, timeline</div></div>
+    <div class="cc-step"><div class="step-badge">4</div><div>Influencer must disclose "gifted" or use Instagram paid partnership label (FTC)</div></div>
+    <div class="cc-step"><div class="step-badge">5</div><div>Request Collaborator invite on their post so it appears on Avelure feed too</div></div>
+  </div>
+  <div class="cc-note"><div class="cc-note-title">FTC compliance:</div><ul><li>All gifted/paid content must disclose "gifted," "ad," or paid partnership label</li><li>"Results may vary" must be included in all treatment result posts</li><li>No fabricated reviews or fake testimonials &mdash; ever</li></ul></div>
+  </div></div>
+
+  <div class="cc"><div class="cc-hd"><div class="cc-icon" style="background:#fff7ed;color:#9a3412">&#128228;</div><div class="cc-title">Reposting &amp; UGC</div></div>
+  <div class="cc-body"><div class="cc-steps">
+    <div class="cc-step"><div class="step-badge">1</div><div>Monitor tagged posts and mentions daily in Instagram notifications</div></div>
+    <div class="cc-step"><div class="step-badge">2</div><div>DM the patient: "We love your post! May we reshare on our Stories?"</div></div>
+    <div class="cc-step"><div class="step-badge">3</div><div>Once confirmed &mdash; reshare to Stories via the paper airplane icon. Always tag the creator.</div></div>
+    <div class="cc-step"><div class="step-badge">4</div><div>For Feed reposts: get written permission first. Always credit the original.</div></div>
+    <div class="cc-step"><div class="step-badge">5</div><div>Save strong UGC to the Reviews highlight on the profile</div></div>
+  </div>
+  <div class="cc-note"><div class="cc-note-title">Encourage UGC by:</div><ul><li>Creating an Instagram-worthy photo area in the clinic</li><li>Asking patients to tag @aveluremedspa after treatment</li><li>"Tag us for a chance to be featured!" as a standing CTA in Stories</li></ul></div>
+  </div></div>
+</div>
+
+<div class="div"></div>
+
+<div class="sh">Content Collection &mdash; What to Request from Clinics</div>
+<div class="alert-red">
+  <div class="alert-title">&#9888; Patient Consent &mdash; Required Before Any Content Is Used</div>
+  <div class="alert-body">Every patient must sign a social media consent form before any photo or video is uploaded or used. No exceptions.
+  <ul><li>Keep a printed or digital consent form at the front desk</li><li>Patient signs before or immediately after treatment</li><li>Form must state photos/videos may be used on social media and marketing materials</li><li>Scanned forms go in the Consent Forms subfolder in the clinic drive</li></ul>
+  <strong>Need a consent form template? Contact the marketing team.</strong></div>
+</div>
+
+<div class="req-g">
+  <div class="req-c"><div class="req-top"><div class="req-icon" style="background:#fce7f3">&#128137;</div><div class="req-title">Botox / Neurotoxin</div></div><div class="req-body"><ul><li>Forehead lines &mdash; relaxed + raised brows</li><li>Frown lines (11s) before and after</li><li>Crow's feet &mdash; eyes open + squinting</li><li>Brow lift, lip flip, jawline slimming</li></ul><span class="rtag rtag-ba">Before &amp; After</span></div></div>
+  <div class="req-c"><div class="req-top"><div class="req-icon" style="background:#fce7f3">&#128132;</div><div class="req-title">Lip Filler</div></div><div class="req-body"><ul><li>Front, 3/4 angle, side profile, close-up</li><li>Natural AND fuller results (separate patients)</li><li>After photo: minimum 2 weeks post-treatment</li></ul><span class="rtag rtag-ba">Before &amp; After</span></div></div>
+  <div class="req-c"><div class="req-top"><div class="req-icon" style="background:#fce7f3">&#10024;</div><div class="req-title">Cheek / Facial Filler</div></div><div class="req-body"><ul><li>Front, 3/4 left and right, side profile</li><li>Chin, jawline, temple &mdash; front + profile</li></ul><span class="rtag rtag-ba">Before &amp; After</span></div></div>
+  <div class="req-c"><div class="req-top"><div class="req-icon" style="background:#fce7f3">&#128065;</div><div class="req-title">Under Eye / Tear Trough</div></div><div class="req-body"><ul><li>Front, slight downward gaze, close-up</li><li>Natural light only &mdash; no flash</li><li>After photo: minimum 2 weeks post-treatment</li></ul><span class="rtag rtag-ba">Before &amp; After</span></div></div>
+  <div class="req-c"><div class="req-top"><div class="req-icon" style="background:#dcfce7">&#127807;</div><div class="req-title">Skin Treatments</div></div><div class="req-body"><ul><li>Full face front, close-up target area, side profile</li><li>Facials, peels, lasers, microneedling, BBL, Halo</li><li>Multi-session results preferred</li></ul><span class="rtag rtag-ba">Before &amp; After</span></div></div>
+  <div class="req-c"><div class="req-top"><div class="req-icon" style="background:#dbeafe">&#127909;</div><div class="req-title">Treatment Videos</div></div><div class="req-body"><ul><li>Injection close-ups, facial treatment in progress</li><li>Before/after reveal moment</li><li>Film vertically &middot; 15&ndash;60 sec &middot; raw file only</li></ul><span class="rtag rtag-vid">Video</span></div></div>
+  <div class="req-c"><div class="req-top"><div class="req-icon" style="background:#dbeafe">&#127897;</div><div class="req-title">Patient Testimonials</div></div><div class="req-body"><ul><li>Patient to camera, 30&ndash;60 seconds</li><li>Prompts: "Why Avelure?" / "How do you feel after?"</li><li>Keep natural &mdash; don't over-script</li></ul><span class="rtag rtag-vid">Video</span></div></div>
+  <div class="req-c"><div class="req-top"><div class="req-icon" style="background:#f0fdf4">&#11088;</div><div class="req-title">Monthly Minimums Per Clinic</div></div><div class="req-body"><ul><li><strong>4+</strong> before/after sets</li><li><strong>2+</strong> treatment video clips</li><li><strong>1+</strong> patient testimonial video</li><li><strong>2&ndash;3</strong> Google review screenshots</li><li>Submit by the <strong>1st of each month</strong></li></ul><span class="rtag rtag-mo">Per clinic monthly</span></div></div>
+</div>
+
+<div class="sh">Photo &amp; Video Standards</div>
+<div class="ht-card">
+  <div class="ht-title"><div class="ht-icon" style="background:#dcfce7">&#128247;</div>Before &amp; after photo requirements (per AMP SOP)</div>
+  <div class="ht-grid">
+    <div class="do-col"><strong>&#10003; Required</strong><ul><li>Neutral black or white backdrop</li><li>Patient standing with floor marker</li><li>Photographer floor marker for consistent distance</li><li>Ring light &mdash; never flash</li><li>All makeup removed</li><li>Face free of hair, glasses, headbands, jewelry</li><li>Angles: front, 45-degree, 90-degree left and right</li><li>Submit raw full images &mdash; no cropping</li><li>Include: practice, provider, treatment, product used, amount, time between photos, restrictions</li></ul></div>
+    <div class="no-col"><strong>&#10007; Never do</strong><ul><li>Do not edit photos or apply filters</li><li>Do not create side-by-side templates &mdash; raw only</li><li>Do not use flash</li><li>Do not take "after" immediately post-treatment &mdash; wait 2 weeks minimum</li><li>Do not submit without signed consent form</li><li>Before &amp; Afters: organic posts ONLY &mdash; NOT allowed in paid Meta ads</li></ul></div>
+  </div>
+</div>
+<div class="ht-card">
+  <div class="ht-title"><div class="ht-icon" style="background:#dbeafe">&#127909;</div>Video shooting standards</div>
+  <div class="ht-grid">
+    <div class="do-col"><strong>&#10003; Required</strong><ul><li>Film vertically (portrait) &mdash; always</li><li>Stabilize on a surface or tripod</li><li>Bright room &mdash; light facing the subject</li><li>15&ndash;60 second clips</li><li>Quiet room &mdash; no background music</li><li>Send original unedited file &mdash; no filters, text, or overlays</li><li>Reels: custom cover image in Canva, captions ON, hook in first 2 seconds</li></ul></div>
+    <div class="no-col"><strong>&#10007; Never do</strong><ul><li>Don't film horizontally (landscape mode)</li><li>Don't film with light behind the subject</li><li>Don't include other patients in background</li><li>Don't add music, text, or stickers &mdash; send raw</li><li>Don't film in dark or yellow-lit rooms</li><li>Don't send over email &mdash; upload to folder directly</li></ul></div>
+  </div>
+</div>
+
+<div class="sh">Clinic Folder Structure</div>
+<div class="fbox">
+  <div class="fbox-title">How each clinic folder is organized</div>
+  <div class="fbox-body">
+    <code>&#128193; [Clinic Name]</code><br>
+    &nbsp;&nbsp;&bull; <code>&#128193; Before &amp; Afters</code><br>
+    &nbsp;&nbsp;&bull; <code>&#128193; Videos</code><br>
+    &nbsp;&nbsp;&bull; <code>&#128193; Clinic Photos</code><br>
+    &nbsp;&nbsp;&bull; <code>&#128193; Reviews &amp; Testimonials</code><br>
+    &nbsp;&nbsp;&bull; <code>&#128193; Consent Forms</code><br><br>
+    <strong>File naming:</strong> <code>BA_LipFiller_Front_March2026.jpg</code> &mdash; not <code>IMG_4829.jpg</code><br>
+    <strong>Submit by:</strong> 1st of each month &middot; Campaign content 2 weeks before go-live
+  </div>
+</div>
+
+<div class="sh">Monthly Submission Checklist</div>
+<div class="cl">
+  <div class="ci" data-ci="ci-rc1"><div class="ib"></div><div><div class="ci-lbl">4+ before &amp; after sets &mdash; multiple angles, consistent lighting, no makeup</div></div><span class="pri ph-hi">Monthly</span></div>
+  <div class="ci" data-ci="ci-rc2"><div class="ib"></div><div><div class="ci-lbl">2+ treatment process video clips &mdash; vertical, raw file, no filters</div></div><span class="pri ph-hi">Monthly</span></div>
+  <div class="ci" data-ci="ci-rc3"><div class="ib"></div><div><div class="ci-lbl">1+ patient testimonial video &mdash; natural, 30&ndash;60 seconds</div></div><span class="pri ph-hi">Monthly</span></div>
+  <div class="ci" data-ci="ci-rc4"><div class="ib"></div><div><div class="ci-lbl">2&ndash;3 Google review screenshots &mdash; 5-star, full text visible</div></div><span class="pri ph-md">Monthly</span></div>
+  <div class="ci" data-ci="ci-rc5"><div class="ib"></div><div><div class="ci-lbl">Signed patient consent form on file for every piece of content submitted</div></div><span class="pri ph-hi">Always</span></div>
+  <div class="ci" data-ci="ci-rc6"><div class="ib"></div><div><div class="ci-lbl">Files named clearly and dropped into correct subfolder</div></div><span class="pri ph-md">Always</span></div>
+  <div class="ci" data-ci="ci-rc7"><div class="ib"></div><div><div class="ci-lbl">Clinic photos updated (exterior, treatment rooms, team)</div></div><span class="pri ph-lo">Quarterly</span></div>
+  <div class="ci" data-ci="ci-rc8"><div class="ib"></div><div><div class="ci-lbl">Provider headshot + intro video on file</div></div><span class="pri ph-lo">One-time</span></div>
+</div>
+</div>
+
+<!-- CALENDAR -->
+<div id="panel-calendar" class="panel">
+<div class="ph"><div><div class="pt">Content Calendar 2026</div><div class="ps">Instagram + Facebook (cross-posted) &mdash; March through December &middot; click any post to mark complete</div></div></div>
+<div class="gold-bar"></div>
+<div class="leg-row">
+  <div class="leg"><div class="leg-dot" style="background:#dbeafe;border:1px solid #93c5fd"></div>Reel</div>
+  <div class="leg"><div class="leg-dot" style="background:#dcfce7;border:1px solid #86efac"></div>Carousel</div>
+  <div class="leg"><div class="leg-dot" style="background:#fef9c3;border:1px solid #fde047"></div>Story</div>
+  <div class="leg"><div class="leg-dot" style="background:#EFE9E3;border:1px solid #D6C8B8"></div>Education</div>
+  <div class="leg"><div class="leg-dot" style="background:#fff7ed;border:1px solid #fdba74"></div>Promo</div>
+  <div class="leg"><div class="leg-dot" style="background:#f0fdf4;border:1px solid #86efac"></div>Giveaway</div>
+  <div class="leg"><span style="font-size:10px;background:#0C1B2B;color:#C6A663;padding:1px 6px;border-radius:3px;font-weight:600">FB</span>&nbsp;Cross-posted to Facebook</div>
+</div>
+<div class="cal-nav" id="cal-nav"></div>
+<div id="cal-content"></div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+var CAL = [
+  {m:"March",y:2026,weeks:[
+    {lbl:"Week 1 | Mar 2-8",posts:[
+      {t:"carousel",h:"Brand Launch BA - Botox Forehead",d:"3-slide: Slide 1 = dramatic after (forehead relaxed). Slide 2 = before (lines visible). Slide 3 = treatment info card with provider name + service.",cap:"Hook: Lines? What lines. Value: Natural Botox that moves with you. CTA: Book your consultation via link in bio.",fb:1},
+      {t:"reel",h:"Clinic Tour - Who Is Avelure?",d:"15-20 sec reel. Slow pan of reception, treatment room, product display. Provider walks into frame and introduces themselves. Text overlay: Luxury aesthetics. Your city.",cap:"Hook: This is where confidence begins. CTA: Find your nearest Avelure location via link in bio.",fb:1},
+      {t:"story",h:"Poll Story - Have you tried Botox?",d:"Single story on Navy background. Poll sticker: Have you tried Botox? Yes love it / Curious but nervous. Follow up with myth-busting fact.",cap:"N/A - story format",fb:0},
+      {t:"story",h:"Link Sticker Story - Book Now",d:"Lifestyle photo of treatment room. Text overlay: Consultations now open. Link sticker to booking page. Custom sticker text: Book My Spot.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 2 | Mar 9-15",posts:[
+      {t:"carousel",h:"Lip Filler BA - Natural Enhancement",d:"4-slide: front-facing after, before, side profile after, treatment details card with product, amount, provider.",cap:"Hook: Subtle. Balanced. You - just elevated. Value: Lip filler that looks like you were born with it. CTA: See our treatment menu via link in bio.",fb:1},
+      {t:"reel",h:"Edu Reel - What to Expect at Your First Visit",d:"Provider or staff on camera 20-30 sec. Walk through: you arrive, we consult, we customize, we treat. Show treatment room. End with patient leaving confidently.",cap:"Hook: First time? Here's what actually happens. CTA: Book your first consultation via link in bio.",fb:1},
+      {t:"story",h:"Behind-the-Scenes - Treatment Room Prep",d:"Short clip of staff setting up treatment room. Text overlay: We prepare so you can relax. No patients in frame.",cap:"N/A - story format",fb:0},
+      {t:"story",h:"Q&A Sticker - Ask us about Botox",d:"Navy/Gold branded story. Question sticker: Ask us anything about Botox! Answer top questions in follow-up stories.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 3 | Mar 16-22",posts:[
+      {t:"edu",h:"Edu Post - Botox Myths Busted",d:"5-slide carousel. Myths: Botox freezes your face / It's only for older patients / It's permanent / It hurts / It looks fake. Each slide = myth + truth in brand colors.",cap:"Hook: We need to talk about these Botox myths. CTA: Have questions? Drop them below or DM us.",fb:1},
+      {t:"reel",h:"Reel - 3 Signs You Might Be Ready for Botox",d:"Provider on camera 15-25 sec. Signs: 1) Lines at rest. 2) Late 20s+ wanting prevention. 3) Want to feel refreshed without looking different. Text overlays for each.",cap:"Hook: 3 signs Botox might be for you. CTA: Consultations are complimentary via link in bio.",fb:1},
+      {t:"story",h:"Book Reminder Story",d:"Branded story with urgency. Booking for April is filling up. Link sticker to booking page. Custom text: Grab Your Spot.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 4 | Mar 23-31",posts:[
+      {t:"carousel",h:"Under-Eye Filler BA - Tear Trough",d:"3-slide: refreshed after (hollows filled), tired before, The difference card with bullet points: less shadowing, more volume, no makeup needed.",cap:"Hook: Tired eyes? Not anymore. Value: Tear trough filler addresses the hollows that make you look exhausted. CTA: DM us EYES for more info.",fb:1},
+      {t:"reel",h:"Provider Intro Reel",d:"Provider to camera 20-30 sec. Hi, I'm [Name], [title] at Avelure [location]. I specialize in [treatments]. My goal is [patient outcome]. Warm, confident. End with clinic name + handle overlay.",cap:"Hook: Meet the person behind your results. CTA: Book with [Name] via link in bio.",fb:1},
+      {t:"story",h:"Google Review Reshare",d:"Screenshot of 5-star Google review - ensure no patient PHI visible. Add Avelure branded frame. Text: This is why we do what we do. Link sticker: Read More Reviews.",cap:"N/A - story format",fb:0}
+    ]}
+  ]},
+  {m:"April",y:2026,weeks:[
+    {lbl:"Week 1 | Apr 1-6",posts:[
+      {t:"carousel",h:"Skin Treatment BA - Texture and Tone",d:"4-slide: glowing even after, uneven before, close-up skin after, treatment details card (what was done, sessions, timeline).",cap:"Hook: Your skin has a glow setting. We found it. Value: [treatment] addresses [concern] with [# sessions]. CTA: Schedule a skin consult via link in bio.",fb:1},
+      {t:"reel",h:"Edu Reel - How Long Does Filler Last?",d:"Provider on camera 25-35 sec. Break down by area: lips 6-12 months, cheeks 12-18 months, under eye 12-24 months. Fast and informative with text overlays.",cap:"Hook: How long does filler last? It depends on where. CTA: Book a consultation via link in bio.",fb:1},
+      {t:"story",h:"Q&A Sticker - Ask about fillers",d:"Branded story. Question sticker. Answer top 3-5 responses in follow-up stories same day.",cap:"N/A - story format",fb:0},
+      {t:"story",h:"Client Testimonial Reshare",d:"Reshare a tagged patient post or video testimonial (with consent). Add Avelure branded frame. Text: We love hearing from you. Tag original poster.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 2 | Apr 6-13",posts:[
+      {t:"edu",h:"Edu Post - Filler Types Explained",d:"Infographic carousel: Not all fillers are the same. Breakdown: Hyaluronic acid (lips, cheeks, under eye), Sculptra (collagen stimulator), Radiesse (structure). Brand colors throughout.",cap:"Hook: There's more than one type of filler - here's what you should know. CTA: Ask us which is right for you via DM or link in bio.",fb:1},
+      {t:"reel",h:"Treatment POV Reel - Lip Filler Appointment",d:"First-person POV: arriving at clinic, consultation, treatment chair, mirror reveal. 20-30 sec. Focus on the experience, not just the outcome.",cap:"Hook: What a lip filler appointment actually looks like. CTA: Yours could look like this - book via link in bio.",fb:1},
+      {t:"story",h:"Staff Spotlight Story",d:"Quick intro of team member - photo or short clip. Name, title, location, one thing they love about their job. Warm and approachable.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 3 | Apr 14-20 | Spring Promo",posts:[
+      {t:"promo",h:"Spring Campaign - Spring Refresh Promo Launch",d:"Feed post or carousel. Announce spring specials. Feature 2-3 treatments with savings. Soft seasonal aesthetic, light and fresh. Include expiry date for urgency.",cap:"Hook: Spring is the perfect time to refresh. Value: [list treatments + savings]. CTA: Book before [date] via link in bio.",fb:1},
+      {t:"reel",h:"Spring Transformation Reel",d:"Before/after reveal with spring energy. Light, bright, clean. Text overlay: New season. New you. Feature the promo treatment. 20 sec.",cap:"Hook: Spring glow unlocked. CTA: Our Spring Refresh specials are live via link in bio.",fb:1},
+      {t:"story",h:"Countdown Story - Promo Ends Soon",d:"Countdown sticker to promo end date. Spring specials end [date]. Link sticker to Monthly Specials page.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 4 | Apr 21-30 | Giveaway",posts:[
+      {t:"giveaway",h:"Giveaway Post - $500 Avelure Credit",d:"Feed post high-design. Prize: $500 toward any treatment. Entry: Follow + tag 2 friends in comments. Optional: share to stories for bonus entry. Clear rules + end date. Brand colors.",cap:"Hook: We're giving away $500 in Avelure treatments. Rules: Follow @aveluremedspa + tag 2 friends below. Winner announced [date]. CTA: Enter now - tag your partner.",fb:1},
+      {t:"reel",h:"Giveaway Announcement Reel",d:"Energetic 15 sec. Staff or provider: We're doing a giveaway and you're going to want to enter. Cut to prize visual. How to enter on screen.",cap:"Hook: GIVEAWAY TIME. CTA: Enter on our feed post.",fb:1},
+      {t:"story",h:"Giveaway Last Call Story",d:"Day before giveaway ends. Countdown sticker. Last chance to enter our $500 giveaway! Link sticker to feed post.",cap:"N/A - story format",fb:0}
+    ]}
+  ]},
+  {m:"May",y:2026,weeks:[
+    {lbl:"Week 1 | May 1-3 | Mothers Day Prep",posts:[
+      {t:"promo",h:"Mothers Day Campaign - Gift Cards and Packages",d:"Feed post or carousel. Gift card options, mother-daughter packages, limited-time specials. Warm emotional visual. Seasonal urgency.",cap:"Hook: Give her the gift she actually wants. Value: Avelure gift cards + Mothers Day packages available now. CTA: Get yours via link in bio.",fb:1},
+      {t:"reel",h:"Gift Card Promo Reel",d:"15-20 sec. Quick-cut of treatment experience - reception, consultation, relaxed patient, glowing result. Text: The best Mothers Day gift. End with gift card visual.",cap:"Hook: She deserves more than flowers. CTA: Gift cards available now via link in bio.",fb:1},
+      {t:"story",h:"Book for Mom CTA Story",d:"Branded story. Mothers Day is [X] days away. Countdown sticker. Link sticker: Shop Gift Cards.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 2 | May 4-10",posts:[
+      {t:"carousel",h:"Lip Filler Refresh BA - 6-Month Touch-Up",d:"Show patient's original result and 6-month refresh. 4 slides: original after, original before, refresh after, What we did for the refresh card. Shows the maintenance journey.",cap:"Hook: 6 months later - and she's back for a refresh. Value: Filler isn't a one-and-done. Touch-ups often require less product over time. CTA: Book your refresh via link in bio.",fb:1},
+      {t:"reel",h:"Edu Reel - Preventative Botox Explained",d:"Provider on camera 25-30 sec. Preventative Botox is for patients in their 20s-30s who want to stop lines before they form. Calm and educational.",cap:"Hook: The best time to start Botox might be before you think you need it. CTA: Consultations always complimentary via link in bio.",fb:1},
+      {t:"story",h:"Provider Feature Story",d:"Provider photo or short clip. Name, credential, location, currently booking [month]. Link sticker: Book with [Name].",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 3 | May 11-17",posts:[
+      {t:"edu",h:"Edu Post - Summer Skin Prep Guide",d:"Carousel: Your summer skin prep checklist. Slides: 1) SPF reapply every 2 hours. 2) Schedule peel or laser BEFORE summer. 3) Hydration treatments. 4) What to avoid. 5) Book now for best timing.",cap:"Hook: Summer skin starts now - not in June. CTA: Ask us what's right for your skin via DM or link in bio.",fb:1},
+      {t:"reel",h:"Reel - Get Summer-Ready Treatments at Avelure",d:"Quick-cut of 3-4 summer treatments. Each cut = treatment name + available at Avelure. End with clinic exterior. Upbeat, aspirational. 15-20 sec.",cap:"Hook: Summer skin is a treatment plan, not an accident. CTA: Book your summer prep appointment via link in bio.",fb:1},
+      {t:"story",h:"Poll - Summer Skin Goals",d:"What's your #1 summer skin goal? Poll options: Glow + even tone / Smooth texture / Fewer breakouts / All of the above. Follow up with educational content based on responses.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 4 | May 18-31",posts:[
+      {t:"carousel",h:"Monthly BA Roundup - May Results",d:"5-slide carousel of the month's best before/afters. Mix of treatments. Editorial layout. End slide: Book your transformation via link in bio.",cap:"Hook: May results - and we're proud of every single one. Value: Real patients, real results, no filters. CTA: Ready for yours? via link in bio.",fb:1},
+      {t:"reel",h:"Monthly Recap Reel",d:"Montage of May clinic content - treatment clips, team moments, patient reveals (consented). 20-30 sec. Warm and authentic. End with June booking CTA.",cap:"Hook: A look at May. CTA: June appointments are open via link in bio.",fb:1},
+      {t:"story",h:"June Preview + Promo Tease",d:"Something special is coming in June. Teaser story. Creates anticipation for June campaign.",cap:"N/A - story format",fb:0}
+    ]}
+  ]},
+  {m:"June",y:2026,weeks:[
+    {lbl:"Week 1 | Jun 1-7 | Summer Glow",posts:[
+      {t:"promo",h:"Summer Glow Campaign Launch",d:"High-impact feed post. Announce summer specials - skin, injectables, package deals. Summer aesthetic: warm light, golden tones. 2-3 featured treatments with savings.",cap:"Hook: Your summer glow era starts now. Value: Summer Glow specials live - [list highlights]. CTA: Book before spots fill via link in bio.",fb:1},
+      {t:"reel",h:"Ready for Summer Transformation Reel",d:"Before/after reveal with summer energy. Patient showing refreshed glowing skin or filler result. Text: Summer's calling. Answer it. Bright, confident. 20 sec.",cap:"Hook: Summer called. She answered. CTA: Summer Glow specials are open via link in bio.",fb:1},
+      {t:"story",h:"Summer Package CTA Story",d:"Branded story showcasing summer package. Link sticker to Monthly Specials page. Custom sticker: See Summer Specials.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 2 | Jun 8-14",posts:[
+      {t:"carousel",h:"Skin Resurfacing BA - Texture and Sun Damage",d:"4-slide: clear smooth even after, pigmentation texture before, close-up after, treatment card with what was done, sessions, timeline.",cap:"Hook: Sun damage doesn't have to be permanent. Value: [Treatment] resurfaces skin at a cellular level - fading pigmentation and smoothing texture. CTA: Schedule a skin consult via link in bio.",fb:1},
+      {t:"reel",h:"Edu Reel - Sun Damage Treatment Options",d:"Provider on camera 25 sec. If you're dealing with sun spots, uneven tone, or rough texture - here are your options at Avelure. List 3 treatments with 1-sentence description each.",cap:"Hook: Sun damage is treatable. Here's how. CTA: Book a skin consultation via link in bio.",fb:1},
+      {t:"story",h:"FAQ Story - Summer Skincare Questions",d:"Question sticker: Ask us your summer skincare questions. Answer top 5 in follow-up stories. Pull best answer into FAQs highlight.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 3 | Jun 15-21",posts:[
+      {t:"edu",h:"Edu Post - SPF + Injectables Post-Treatment Guide",d:"Carousel: Your post-treatment sun guide. After Botox - avoid sun/heat 24 hrs. After filler - avoid direct sun 2 weeks. After laser/peel - SPF non-negotiable. SPF recommendations.",cap:"Hook: Got a treatment recently? Your SPF game needs to match. CTA: Ask about our skincare recommendations via DM or link in bio.",fb:1},
+      {t:"reel",h:"Provider Q&A Reel",d:"Provider answers 3 of the most-asked questions from the week's Stories Q&A. 25-35 sec. Fast and punchy. Each answer 7-10 seconds. Question text on screen.",cap:"Hook: You asked, we answered. CTA: More questions? DM us anytime.",fb:1},
+      {t:"story",h:"Client Reshare - Tagged Post",d:"Reshare a tagged patient post or story (with permission). Add Avelure branded frame. Text: We love seeing your results. Tag original poster.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 4 | Jun 22-30",posts:[
+      {t:"carousel",h:"Client Spotlight - Full Treatment Journey",d:"5-slide story: who they are + concern, before, treatment plan, after results, their testimonial quote. Builds trust and emotional connection.",cap:"Hook: Meet [first name only] - here's her Avelure journey. Value: Real patient, real concern, real result. CTA: Ready to start yours? via link in bio.",fb:1},
+      {t:"reel",h:"Clinic Aesthetic Reel - Brand Lifestyle",d:"No treatment content. Pure brand: slow pan of clinic, product shelf, flowers/decor, provider smiling. Music-driven. 15 sec. Builds luxury perception.",cap:"Hook: This is Avelure. CTA: Find your nearest location via link in bio.",fb:1},
+      {t:"story",h:"July Promo Tease",d:"Something new is coming in July. Teaser. Creates anticipation.",cap:"N/A - story format",fb:0}
+    ]}
+  ]},
+  {m:"July",y:2026,weeks:[
+    {lbl:"Week 1 | Jul 1-6",posts:[
+      {t:"promo",h:"July Specials Launch",d:"Feed post announcing July specials. Feature 2-3 treatments. Summer energy - confident, golden, elevated. Include expiry date for urgency.",cap:"Hook: July at Avelure - and the deals are good. CTA: Book before spots fill via link in bio.",fb:1},
+      {t:"reel",h:"Beat the Heat - Cooldown Treatments",d:"It's summer and your skin is talking to us. Quick-cut of cooling hydrating non-heat treatments: HydraFacial, cool laser, injectables. 20 sec. Fresh, energetic.",cap:"Hook: Summer skin SOS. CTA: These treatments are perfect for summer via link in bio.",fb:1},
+      {t:"story",h:"Location Feature Story",d:"30-sec story tour of a specific clinic. Reception, treatment room, exterior. Text: This is your nearest Avelure, [city]. Link sticker: Book at This Location.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 2 | Jul 6-13",posts:[
+      {t:"carousel",h:"Jawline / Facial Contouring BA",d:"4-slide: defined jaw after, before, 3/4 angle after, treatment details card with filler type, amount, provider.",cap:"Hook: A defined jawline changes everything. Value: Jawline filler restores structure and creates sharp sculpted look without surgery. CTA: See if you're a candidate via link in bio.",fb:1},
+      {t:"reel",h:"Reel - What's New at Avelure This Month",d:"Provider or manager on camera. Here's what's new at Avelure [location] this month. New treatment, provider, promotion, or hours. 20-25 sec. Conversational.",cap:"Hook: Updates from Avelure [location]. CTA: Come see us via link in bio.",fb:1},
+      {t:"story",h:"Influencer Collab Tease",d:"Someone special is visiting us this week. Build anticipation. Tag influencer if they've agreed.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 3 | Jul 14-20 | Influencer Week",posts:[
+      {t:"carousel",h:"Influencer Collab - Treatment Experience",d:"USE INSTAGRAM COLLAB FEATURE. 4-slide: influencer in clinic, treatment in progress, result, influencer testimonial quote. Must include: gifted disclosure + results may vary.",cap:"Hook: [Influencer name] visited us for [treatment] - here's what she thought. Disclosure: gifted treatment. CTA: Book the same treatment via link in bio.",fb:1},
+      {t:"reel",h:"Influencer Review Reel - Collab Post",d:"Influencer's video testimonial or reaction to results. USE COLLAB FEATURE. Keep authentic - no over-production. 30-45 sec. Include results may vary.",cap:"Hook: [Name]'s honest thoughts on her Avelure experience. Disclosure: gifted. CTA: See for yourself via link in bio.",fb:1},
+      {t:"story",h:"Influencer Q&A Stories",d:"Influencer answers questions from their audience about the treatment - repost to Avelure Stories with permission.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 4 | Jul 21-31",posts:[
+      {t:"carousel",h:"Mid-Year BA Highlights - Best of H1 2026",d:"6-slide carousel of best before/afters March-July. Mix of treatments. Editorial and high-quality. End slide: The second half of 2026 is even better. Book your transformation.",cap:"Hook: 6 months of results. We're proud of every one. CTA: Ready for yours? via link in bio.",fb:1},
+      {t:"reel",h:"Mid-Year Recap Reel",d:"Montage of best moments March-July. Treatment clips, team moments, patient reveals. 25-30 sec. Celebratory and warm. Text: Half a year of Avelure.",cap:"Hook: 6 months in and we're just getting started. CTA: August appointments open now via link in bio.",fb:1},
+      {t:"story",h:"August Preview",d:"Fall is coming and we're planning something. Teaser for Back-to-You campaign.",cap:"N/A - story format",fb:0}
+    ]}
+  ]},
+  {m:"August",y:2026,weeks:[
+    {lbl:"Week 1 | Aug 1-9 | Back-to-You",posts:[
+      {t:"promo",h:"Back to You - Fall Refresh Campaign",d:"High-impact feed post. As summer ends, refocus on YOU. Feature Botox, filler refresh, skin prep for fall events. Warm golden transitional aesthetic.",cap:"Hook: Summer's winding down. Time to focus on you. Value: [list treatments + savings]. CTA: Book your fall refresh via link in bio.",fb:1},
+      {t:"reel",h:"Fall Treatment Preview Reel",d:"Fall is the best time for these treatments. Provider on camera 25 sec. List: Botox (perfect before holiday season), chemical peels, laser (sun damage correction post-summer), skin hydration.",cap:"Hook: Fall is actually the best season for aesthetics - here's why. CTA: Book your fall prep appointment via link in bio.",fb:1},
+      {t:"story",h:"Book Your Fall Refresh Story",d:"September is almost here. Your refresh appointments are filling up. Countdown sticker. Link sticker: Book My Refresh.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 2 | Aug 10-16",posts:[
+      {t:"carousel",h:"Combination BA - Under Eye + Cheek Filler",d:"Multi-area result. 4 slides: full face refreshed after, before, close-up under-eye, full treatment plan card with areas, product, investment range.",cap:"Hook: Sometimes one treatment isn't the full picture. Value: Combination approach gives the most natural balanced result. CTA: Book a consultation to discuss your goals via link in bio.",fb:1},
+      {t:"reel",h:"Edu Reel - Fall Glow Skin Prep",d:"Provider: Here's what I'd recommend if you want glowing skin this fall. List: Microneedling, chemical peel, HydraFacial. Note: start 6-8 weeks before your event. 25-30 sec.",cap:"Hook: Fall glow doesn't happen by accident - start now. CTA: Book your skin prep consultation via link in bio.",fb:1},
+      {t:"story",h:"Provider Spotlight Story",d:"Feature specific provider: photo or short clip. Credentials, specialty, current booking availability. Link sticker: Book with [Name].",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 3 | Aug 17-23",posts:[
+      {t:"edu",h:"Edu Post - Filler Maintenance 101",d:"Carousel: How to make your filler last longer. Slides: Stay hydrated. Avoid excessive heat/sun. Don't smoke. Use good skincare. Schedule touch-up at the right time.",cap:"Hook: You invested in your filler. Here's how to protect it. CTA: Need a touch-up? Book now via link in bio.",fb:1},
+      {t:"reel",h:"Reel - How Often Should You Get Botox?",d:"Provider on camera 20-25 sec. The honest answer: it depends on you. Cover how quickly you metabolize, muscle strength, treatment goals. General guideline: every 3-4 months.",cap:"Hook: How often do you actually need Botox? Let's talk. CTA: Come in for a consultation and we'll make a personalized plan via link in bio.",fb:1},
+      {t:"story",h:"Poll - Fall Refresh Plans",d:"Are you thinking about a fall refresh? Poll: Already booked / Thinking about it / Tell me more. Follow with relevant content.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 4 | Aug 24-31",posts:[
+      {t:"carousel",h:"Client Testimonial Roundup - August",d:"4-slide carousel of Google review screenshots or testimonial stills (no PHI). Each slide = one testimonial styled on brand. End slide: Your results are next.",cap:"Hook: This is what our patients are saying. And we're grateful for every word. CTA: Ready to experience it yourself? via link in bio.",fb:1},
+      {t:"reel",h:"Clinic Location Feature Reel",d:"Feature a specific Avelure location - 20 sec. Exterior, reception, treatment room, team wave. Text: This is Avelure [city]. Build local community connection.",cap:"Hook: Your nearest Avelure [city]. CTA: Book at this location via link in bio.",fb:1},
+      {t:"story",h:"September Promo Tease",d:"Something is coming for fall... stay tuned. Aesthetic teaser. Warm autumnal palette.",cap:"N/A - story format",fb:0}
+    ]}
+  ]},
+  {m:"September",y:2026,weeks:[
+    {lbl:"Week 1 | Sep 1-6 | Fall Campaign",posts:[
+      {t:"promo",h:"Fall Aesthetic Campaign Launch",d:"High-impact feed post. Campaign: fall renewal, holiday prep. Feature: injectable refresh, laser treatments, skin prep packages. Warm autumnal aesthetic.",cap:"Hook: Fall into your best skin. Value: [list treatments + savings]. Offer ends [date]. CTA: Book your fall appointment via link in bio.",fb:1},
+      {t:"reel",h:"Fall into Your Best Self Reel",d:"Before/after reveal with fall energy. Warm color grading, confident patient. Text: Fall refresh. Zero regrets. Feature most popular fall treatment. 20 sec.",cap:"Hook: New season. New skin. CTA: Fall specials are live via link in bio.",fb:1},
+      {t:"story",h:"Book Your Fall Appointment Story",d:"Fall appointments are filling fast. Countdown sticker. Link sticker: Book My Fall Appointment.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 2 | Sep 7-13",posts:[
+      {t:"carousel",h:"Full-Face Refresh BA",d:"5 slides: full face refreshed after, before, close-up key area, 3/4 angle, full treatment plan breakdown. Show power of holistic approach.",cap:"Hook: A full-face refresh - and no, she didn't have surgery. Value: The right combination of treatments = a fully refreshed look with zero downtime. CTA: Book a comprehensive consultation via link in bio.",fb:1},
+      {t:"reel",h:"Edu Reel - Fall Filler Trends",d:"Provider on camera. What I'm seeing patients asking for this fall: Natural lip enhancement, jawline definition, temple volume, subtle cheek lift. Current and trend-aware. 25-30 sec.",cap:"Hook: These are the treatments everyone is asking about this fall. CTA: Book your consultation via link in bio.",fb:1},
+      {t:"story",h:"FAQ Story - Fall Treatment Questions",d:"Fall treatment questions - ask us anything. Question sticker. Pull best answers into FAQs highlight.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 3 | Sep 14-20",posts:[
+      {t:"edu",h:"Edu Post - Preventative Aging in Your 30s and 40s",d:"Carousel: What to do in your 30s vs 40s for skin longevity. 30s: Botox prevention, SPF, retinol, antioxidants. 40s: Volume replacement, skin resurfacing, collagen stimulation. Empowering not fear-based.",cap:"Hook: Your 30s and 40s skin needs different things. Here's the breakdown. CTA: Not sure where to start? That's what consultations are for via link in bio.",fb:1},
+      {t:"reel",h:"Patient Transformation Story Reel",d:"Patient shares on camera (consented): why they came in, what they were self-conscious about, what they got done, how they feel now. 30-45 sec. Authentic, emotional, powerful.",cap:"Hook: [Name] came to us feeling [feeling]. Here's her story. CTA: Your story starts with a consultation via link in bio.",fb:1},
+      {t:"story",h:"Video Testimonial Reshare",d:"Reshare a consented patient video testimonial. Branded frame overlay. This is why we do what we do. Save to Reviews highlight.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 4 | Sep 21-30",posts:[
+      {t:"carousel",h:"September BA Roundup",d:"Best before/afters of the month. Mix of treatments. Editorial layout. End slide: October appointments are open.",cap:"Hook: September results. Real patients, real results. CTA: October appointments are open via link in bio.",fb:1},
+      {t:"reel",h:"Provider Feature - Meet the Team",d:"Multiple team members on camera 2-3 seconds each: name, title, location. Warm professional human. We can't wait to meet you. 20-25 sec.",cap:"Hook: The people behind your results. CTA: Book with our team via link in bio.",fb:1},
+      {t:"story",h:"October Preview + Milestone Tease",d:"October is coming and so is something exciting. Tease upcoming milestone or giveaway.",cap:"N/A - story format",fb:0}
+    ]}
+  ]},
+  {m:"October",y:2026,weeks:[
+    {lbl:"Week 1 | Oct 1-4 | Milestone",posts:[
+      {t:"promo",h:"Brand Milestone / Anniversary Post",d:"Celebrate an Avelure milestone. High-design feed post. Brand colors, elegant layout. Express gratitude, share the achievement, look ahead. Use Collab with AMP corporate account.",cap:"Hook: We're celebrating and we want you to join us. Value: [milestone details]. CTA: Thank you for being part of our story via link in bio.",fb:1},
+      {t:"reel",h:"Brand Story Reel - Who Is Avelure?",d:"Origin-style reel. Why Avelure exists, what sets it apart, what patients can expect. Provider or manager on camera + B-roll of clinic. 30-40 sec. Emotional and brand-building.",cap:"Hook: The Avelure story - and why it matters to us. CTA: We'd love for you to be part of it via link in bio.",fb:1},
+      {t:"story",h:"Giveaway Announcement Tease Story",d:"Big giveaway coming this week. Teaser. Gets audience primed before Week 2 giveaway.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 2 | Oct 5-11 | Fall Giveaway",posts:[
+      {t:"giveaway",h:"Fall Giveaway - Treatment Bundle",d:"High-design feed post. Prize: fall treatment bundle $500-750 value. Entry: Follow + tag 2 friends. Rules + end date clearly stated. Collab with AMP corporate if applicable.",cap:"Hook: Fall giveaway - we're giving away [prize]. Rules: Follow + tag 2 friends below. Winner announced [date]. CTA: Enter now.",fb:1},
+      {t:"reel",h:"Giveaway Details Reel",d:"Energetic 15-20 sec. We're doing a giveaway and you're going to want this one. Show prize. How to enter on screen. Exciting energy.",cap:"Hook: GIVEAWAY - and it's a good one. CTA: Enter on our feed post.",fb:1},
+      {t:"story",h:"Last Call Giveaway Story",d:"Day before giveaway closes. Countdown sticker. Last chance - giveaway ends tomorrow! Link sticker to feed post.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 3 | Oct 12-18",posts:[
+      {t:"carousel",h:"Lip + Cheek Combo BA",d:"Multi-area: full face after, before, close-up lip after, close-up cheek after. Show how treating multiple areas creates harmony. Treatment details on final slide.",cap:"Hook: Sometimes the glow-up is in the details. Value: Lips and cheeks treated together create naturally balanced result - neither area looks overdone. CTA: Book a combination consult via link in bio.",fb:1},
+      {t:"reel",h:"Holiday Preview Reel - Start Now",d:"The holidays are closer than you think. And Botox takes 2 weeks to fully kick in. Provider on camera 20 sec. If you want to look your best for Nov and Dec, book in October.",cap:"Hook: Holiday season beauty tip: Botox now, glow then. CTA: October is the sweet spot - book now via link in bio.",fb:1},
+      {t:"story",h:"Giveaway Winner Announcement",d:"Announce winner in Stories. Tag winner with permission. Congratulations to [handle]! DM us to claim your prize. Warm and celebratory.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 4 | Oct 19-31 | Holiday Launch",posts:[
+      {t:"promo",h:"Holiday Party-Ready Campaign Launch",d:"Be holiday-ready campaign. Feature: Botox, lip filler, skin glow. Rich festive aesthetic - deep tones, elegant. This is the biggest campaign of Q4. Make it look like a luxury brand launch.",cap:"Hook: The holidays are coming. Your glow-up starts now. Value: [list holiday treatments + savings]. Offer ends [date]. CTA: Book before spots fill via link in bio.",fb:1},
+      {t:"reel",h:"Reel - Holiday Glow Treatment Guide",d:"Provider on camera. Here's what to book and when for the holidays. Timeline: Oct: Botox, filler, lasers. Nov: Touch-ups, skin hydration. Dec: Glow maintenance. 25-30 sec.",cap:"Hook: Your holiday glow timeline. CTA: October is the most important month to book via link in bio.",fb:1},
+      {t:"story",h:"Book Your Holiday Appointment Story",d:"Holiday appointments are filling up. Urgency. Countdown to last available appointments. Link sticker: Book My Holiday Appointment.",cap:"N/A - story format",fb:0}
+    ]}
+  ]},
+  {m:"November",y:2026,weeks:[
+    {lbl:"Week 1 | Nov 1-8 | Gift Cards",posts:[
+      {t:"promo",h:"Gift Card Campaign - Gift the Glow",d:"High-impact feed post. Avelure gift cards as the ultimate gift. Show branded gift card mockup. Feature price points. Emotional hook: give someone the gift of confidence.",cap:"Hook: The gift they actually want. The one they'd never buy themselves. Value: Avelure gift cards available in any amount. CTA: Gift cards available now via link in bio.",fb:1},
+      {t:"reel",h:"Gift the Glow Promo Reel",d:"What if you gave someone the gift of confidence this holiday? Quick-cut of gift card, treatment experience, glowing patient. 15-20 sec. Warm, luxurious.",cap:"Hook: Give the gift of Avelure. CTA: Gift cards available now via link in bio.",fb:1},
+      {t:"story",h:"Gift Card CTA Story",d:"Gift cards make the perfect gift for her (or yourself). Link sticker to gift card purchase page. Custom sticker: Get a Gift Card.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 2 | Nov 9-15",posts:[
+      {t:"carousel",h:"Holiday-Ready BA - Full Face",d:"5 slides: glowing polished after, before, close-up skin, close-up lips, treatment plan card. Holiday ready framing. Aspirational and achievable.",cap:"Hook: Holiday ready - and she didn't need a single filter. Value: The right treatments at the right time = effortless holiday glow. CTA: November appointments available via link in bio.",fb:1},
+      {t:"reel",h:"Get Glam Before the Holidays Reel",d:"Treatment montage: Botox, filler, skin. Quick-cut, festive energy. 15-20 sec. Text: Holiday glow unlocked. Feature real consented patient results.",cap:"Hook: Your holiday glow checklist. CTA: Appointments still available via link in bio.",fb:1},
+      {t:"story",h:"Countdown to Holiday Booking Deadline",d:"Last Botox appointments for holiday results: [date]. Countdown sticker. Botox takes 2 weeks to fully kick in - book now to guarantee results. Link sticker: Book Now.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 3 | Nov 16-22 | Thanksgiving",posts:[
+      {t:"edu",h:"Edu Post - Timing Your Botox Before Events",d:"Carousel: Planning an event? Here's your treatment timeline. Botox: 2 weeks before. Filler: 2-4 weeks before. Laser/peel: 4-6 weeks before. Practical and shareable.",cap:"Hook: Timing is everything when it comes to aesthetic treatments. CTA: Have an event coming up? Let's plan your timeline via link in bio.",fb:1},
+      {t:"reel",h:"Thanksgiving Gratitude Reel - Team",d:"Team members on camera 2 seconds each saying one thing they're grateful for. Warm, human, authentic. Not a sales post. Build brand love. 20-25 sec.",cap:"Hook: This Thanksgiving, we're grateful for you. CTA: Thank you for trusting us with your care.",fb:1},
+      {t:"story",h:"Thank You to Clients Story",d:"This Thanksgiving, we want to say thank you to every single one of our patients. Warm branded story. No CTA - pure gratitude.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 4 | Nov 23-30 | Black Friday",posts:[
+      {t:"promo",h:"Black Friday / Cyber Monday Specials",d:"High-energy promo. Black Friday at Avelure. Feature biggest savings of the year. Limited time - ends Cyber Monday. Create urgency with countdown or limited availability framing.",cap:"Hook: Black Friday deals at Avelure - and yes, they're this good. Value: [list BF deals + savings]. Offer ends [date]. CTA: Shop now via link in bio.",fb:1},
+      {t:"reel",h:"Black Friday Deal Announcement Reel",d:"Energetic 15 sec. Fast-cut text reveals for each deal. Botox: $[X]. Filler: $[X]. [Treatment]: $[X]. Build to a crescendo. Limited time. Book now. On-brand but high-energy.",cap:"Hook: Our Black Friday deals are HERE. CTA: Book before spots fill via link in bio.",fb:1},
+      {t:"story",h:"Flash Sale Countdown Story",d:"Countdown sticker to end of Black Friday offer. Offer ends [date + time]. Link sticker: Book My BF Deal. Urgent and direct.",cap:"N/A - story format",fb:0}
+    ]}
+  ]},
+  {m:"December",y:2026,weeks:[
+    {lbl:"Week 1 | Dec 1-6 | Last Call",posts:[
+      {t:"promo",h:"Last Call - Holiday Appointments",d:"Last available holiday appointments. Urgency - very few spots left before the holidays. Feature most popular December treatments. Festive but premium design.",cap:"Hook: Last call for holiday appointments. Value: A few spots remain for December treatments. Don't miss your chance. CTA: Book now before they're gone via link in bio.",fb:1},
+      {t:"reel",h:"Holiday Party Season Results Reel",d:"Montage of holiday-ready results. Glowing skin, defined lips, smooth foreheads. Text: Party season is here. Are you ready? 15-20 sec. Confident and celebratory.",cap:"Hook: Tis the season to glow. CTA: Last holiday appointments available via link in bio.",fb:1},
+      {t:"story",h:"Book Before Dec 20 Urgency Story",d:"Book before December 20 for guaranteed holiday results. Hard deadline. Countdown sticker. Link sticker: Book Now - Last Spots.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 2 | Dec 7-13",posts:[
+      {t:"carousel",h:"Year in Review - Best BAs of 2026",d:"8-slide carousel of best before/afters of the entire year. Mix of treatments, providers, locations. This is the greatest hits post of the year. End slide: 2027 is looking even better. Book now.",cap:"Hook: 2026 was a year of transformations. Here are some of our favorites. CTA: Ready to be in our 2027 roundup? via link in bio.",fb:1},
+      {t:"reel",h:"Best of 2026 Transformation Reel",d:"Montage of best results, patient moments, team moments, clinic highlights from the year. 30-40 sec. Celebratory, warm, emotional. Thank you for an incredible 2026.",cap:"Hook: 2026 - what a year. Here's a look back. CTA: 2027 appointments are open via link in bio.",fb:1},
+      {t:"story",h:"Client Appreciation Shoutout Stories",d:"Feature individual patients (consented, first name only) with result and one-sentence gratitude note. Thank you [Name] for trusting us with your care. Run 5-8 stories. Deep and personal.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 3 | Dec 14-20 | Holiday",posts:[
+      {t:"promo",h:"Seasons Greetings from Avelure",d:"Holiday post - high-design, brand-consistent. Feature team or beautiful clinic image. Warm wishes for the holiday season. Human, warm, not a sales post. Builds brand love.",cap:"Hook: From our Avelure family to yours - happy holidays. No hard CTA - let it be genuine.",fb:1},
+      {t:"reel",h:"Team Holiday Message Reel",d:"Team members on camera: Happy Holidays from Avelure [location]! 2 seconds each, quick-cut. Joyful, warm, human. 15-20 sec. End with Avelure logo.",cap:"Hook: Happy holidays from all of us at Avelure. No hard CTA - pure goodwill.",fb:1},
+      {t:"story",h:"Holiday Hours Reminder Story",d:"Our holiday hours: [dates + times]. We're open through [date] and back [date]. Practical and helpful. Link sticker: Book Before We Close.",cap:"N/A - story format",fb:0}
+    ]},
+    {lbl:"Week 4 | Dec 21-31 | New Year",posts:[
+      {t:"promo",h:"New Year - New You Campaign Launch",d:"2027 is your year. Fresh start, reset, transformation. Botox, filler, skin packages for January. Clean aspirational forward-looking aesthetic. First post of the next chapter.",cap:"Hook: New year. New you. Same Avelure - just better. Value: [list New Year specials]. CTA: Book your January consultation via link in bio.",fb:1},
+      {t:"reel",h:"2027 Aesthetic Reset Reel",d:"Provider on camera. New year, new treatment plan. Here's what I'd recommend to start 2027 fresh: Botox reset, filler refresh, skin reboot. Confident, expert, forward-looking. 25-30 sec.",cap:"Hook: Starting 2027 fresh. Here's the plan. CTA: January appointments open now via link in bio.",fb:1},
+      {t:"story",h:"New Year Booking Story",d:"2027 consultations are now open. Fresh, clean, new-year energy. Link sticker: Book My January Consult.",cap:"N/A - story format",fb:0}
+    ]}
+  ]}
+];
+
+// ── BUILD CALENDAR ──────────────────────────────────────────────────────────
+function buildCalendar() {
+  var nav = document.getElementById('cal-nav');
+  var content = document.getElementById('cal-content');
+  var typeLabels = {reel:'Reel',carousel:'Carousel',story:'Story',edu:'Education Post',promo:'Promo / Campaign',giveaway:'Giveaway'};
+
+  CAL.forEach(function(month, mi) {
+    var btn = document.createElement('button');
+    btn.className = 'mbtn' + (mi === 0 ? ' active' : '');
+    btn.textContent = month.m;
+    btn.dataset.mi = mi;
+    nav.appendChild(btn);
+
+    var mBlock = document.createElement('div');
+    mBlock.className = 'cal-month' + (mi === 0 ? ' active' : '');
+    mBlock.id = 'cal-m-' + mi;
+
+    var mtitle = document.createElement('div');
+    mtitle.className = 'cal-mtitle';
+    mtitle.textContent = month.m + ' ' + month.y;
+    mBlock.appendChild(mtitle);
+
+    month.weeks.forEach(function(week, wi) {
+      var wb = document.createElement('div');
+      wb.className = 'week-blk';
+
+      var wlbl = document.createElement('div');
+      wlbl.className = 'wk-lbl';
+      wlbl.textContent = week.lbl;
+      wb.appendChild(wlbl);
+
+      var pg = document.createElement('div');
+      pg.className = 'posts-g';
+
+      week.posts.forEach(function(post, pi) {
+        var id = 'pc-' + mi + '-' + wi + '-' + pi;
+        var card = document.createElement('div');
+        card.className = 'pc pc-' + post.t;
+        card.id = id;
+
+        var topHtml = '<div class="pc-top">'
+          + '<div class="pchk" data-pchk="' + id + '"></div>'
+          + '<span class="ptype">' + (typeLabels[post.t] || post.t) + '</span>'
+          + (post.fb ? '<span class="fb-badge">FB</span>' : '')
+          + '</div>';
+
+        card.innerHTML = topHtml
+          + '<div class="pc-title">' + post.h + '</div>'
+          + '<div class="pc-detail">' + post.d + '</div>'
+          + '<div class="pc-cap"><div class="pc-cap-lbl">Caption direction</div><div class="pc-cap-txt">' + post.cap + '</div></div>';
+
+        pg.appendChild(card);
+      });
+
+      wb.appendChild(pg);
+      mBlock.appendChild(wb);
+    });
+
+    content.appendChild(mBlock);
+  });
+
+  // Calendar nav clicks
+  nav.addEventListener('click', function(e) {
+    var btn = e.target.closest('.mbtn');
+    if (!btn) return;
+    var mi = parseInt(btn.dataset.mi);
+    document.querySelectorAll('.cal-month').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.mbtn').forEach(function(b) { b.classList.remove('active'); });
+    document.getElementById('cal-m-' + mi).classList.add('active');
+    btn.classList.add('active');
+  });
+
+  // Post card check clicks
+  content.addEventListener('click', function(e) {
+    var chk = e.target.closest('[data-pchk]');
+    if (!chk) return;
+    var card = document.getElementById(chk.dataset.pchk);
+    if (!card) return;
+    card.classList.toggle('done');
+    chk.classList.toggle('done-c');
+    updateStats();
+  });
+}
+
+// ── NAV ─────────────────────────────────────────────────────────────────────
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+  var panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.add('active');
+  var navItem = document.querySelector('.nav-item[data-panel="' + id + '"]');
+  if (navItem) navItem.classList.add('active');
+}
+
+// ── TOGGLES ──────────────────────────────────────────────────────────────────
+function toggleSC(el) {
+  var card = el.closest('.sc');
+  var chk = card.querySelector('.chk');
+  var wasDone = chk.classList.contains('done-c');
+  chk.classList.toggle('done-c', !wasDone);
+  chk.classList.toggle('wip-c', false);
+  card.classList.toggle('done', !wasDone);
+  if (!wasDone) card.classList.remove('wip');
+  updateStats();
+}
+
+function toggleTC(el) {
+  var card = el.closest('.tc');
+  var box = card.querySelector('.tb');
+  var wasDone = box.classList.contains('done-c');
+  box.classList.toggle('done-c', !wasDone);
+  box.classList.toggle('wip-c', false);
+  card.classList.toggle('done', !wasDone);
+  if (!wasDone) card.classList.remove('wip');
+  updateStats();
+}
+
+function toggleCI(el) {
+  var item = el.closest('.ci');
+  var box = item.querySelector('.ib');
+  var wasDone = box.classList.contains('done-c');
+  box.classList.toggle('done-c', !wasDone);
+  item.classList.toggle('done', !wasDone);
+  updateStats();
+}
+
+// ── STATS ────────────────────────────────────────────────────────────────────
+function updateStats() {
+  var done = document.querySelectorAll('.chk.done-c, .tb.done-c, .ib.done-c').length;
+  var wip = document.querySelectorAll('.chk.wip-c, .tb.wip-c').length;
+  var total = document.querySelectorAll('.chk, .tb').length;
+  var calDone = document.querySelectorAll('.pc.done').length;
+  var calTotal = document.querySelectorAll('.pc').length;
+  var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  var el;
+  if ((el = document.getElementById('s-done'))) el.textContent = done;
+  if ((el = document.getElementById('s-wip'))) el.textContent = wip;
+  if ((el = document.getElementById('s-todo'))) el.textContent = Math.max(0, total - done - wip);
+  if ((el = document.getElementById('s-cal'))) el.textContent = calDone + '/' + calTotal;
+  if ((el = document.getElementById('pct'))) el.textContent = pct + '%';
+  if ((el = document.getElementById('pbar'))) el.style.width = pct + '%';
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  // Nav links
+  document.querySelectorAll('.nav-item[data-panel]').forEach(function(item) {
+    item.addEventListener('click', function() {
+      showPanel(this.getAttribute('data-panel'));
+    });
+  });
+
+  // Step cards (.sc)
+  document.addEventListener('click', function(e) {
+    var chk = e.target.closest('.sc .chk');
+    if (chk) { toggleSC(chk); return; }
+    var tb = e.target.closest('.tc .tb');
+    if (tb) { toggleTC(tb); return; }
+    var ib = e.target.closest('.ci .ib');
+    if (ib) { toggleCI(ib); return; }
+  });
+
+  buildCalendar();
+  updateStats();
+});
+</script>
+</div>
+</body>
+</html>
